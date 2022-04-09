@@ -1,0 +1,48 @@
+Employees Handbook
+1. Required id are according to...
+2. The destination should be correctly stated
+3. The encryption method should be according to destination's policy
+4. The request type should be matched to the Action required
+//
+Our Policies
+1. To protect our customers, please choose Read Only scope if action is download
+2. Extend to No.1, always write to our application assigned folder if action is upload
+3. Only special cases will need All Access scope
+4. More update on later date
+//
+Employees Handbook1
+1. Required id are according to...
+2. The destination should be correctly stated
+3. The encryption method should be according to destination's policy
+4. The request type should be matched to the Action required
+//
+Our Policies1
+1. To protect our customers, please choose Read Only scope if action is download
+2. Extend to No.1, always write to our application assigned folder if action is upload
+3. Only special cases will need All Access scope
+4. More update on later date
+//
+Employees Handbook2
+1. Required id are according to...
+2. The destination should be correctly stated
+3. The encryption method should be according to destination's policy
+4. The request type should be matched to the Action required
+//
+Our Policies2
+1. To protect our customers, please choose Read Only scope if action is download
+2. Extend to No.1, always write to our application assigned folder if action is upload
+3. Only special cases will need All Access scope
+4. More update on later date
+//
+Employees Handbook3
+1. Required id are according to...
+2. The destination should be correctly stated
+3. The encryption method should be according to destination's policy
+4. The request type should be matched to the Action required
+//
+Our Policies3
+1. To protect our customers, please choose Read Only scope if action is download
+2. Extend to No.1, always write to our application assigned folder if action is upload
+3. Only special cases will need All Access scope
+4. More update on later date
+//

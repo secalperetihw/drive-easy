@@ -1,0 +1,8 @@
+Player: distributor of "DriveEasy" App
+process: 
+    get package
+    authicate source
+    authorize from drive
+    http request
+    cloud's encryption
+    

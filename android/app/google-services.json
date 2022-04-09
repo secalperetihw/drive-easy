@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "531823287509",
+    "project_id": "drive-easy-a8106",
+    "storage_bucket": "drive-easy-a8106.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:531823287509:android:2198f2007cdba5ff79165c",
+        "android_client_info": {
+          "package_name": "com.forpersonaluse.drive_easy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "531823287509-ifk2dppmjb9r930j1uit7vk8af7g8612.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.forpersonaluse.drive_easy",
+            "certificate_hash": "1889011dd16fd77829e69b9bdbb70d7bb4ef93f0"
+          }
+        },
+        {
+          "client_id": "531823287509-oi3ne2ioo8ohddg8a0culhqif891i3f7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.forpersonaluse.drive_easy",
+            "certificate_hash": "9af9543fa09e1af69125a215c7ef208caaa10d55"
+          }
+        },
+        {
+          "client_id": "531823287509-4fu1d5h2ngivdvjd91cm0fgn282t6av2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6vpRvWVrPByuW0obOdXDUrfAcGSPnuXQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "531823287509-4fu1d5h2ngivdvjd91cm0fgn282t6av2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
