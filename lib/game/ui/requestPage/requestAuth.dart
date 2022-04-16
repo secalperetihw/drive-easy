@@ -1,13 +1,19 @@
+import 'package:drive_easy/classes/game/item.dart';
 import 'package:drive_easy/game/ui/requestPage/requestClasses.dart';
+import 'package:drive_easy/global.dart';
 import 'package:flutter/material.dart';
 
 class requestAuth extends StatefulWidget {
-  Function callback;
+  Item item;
+  Function backButton;
+  ValueChanged<Item> itemCallback;
   double contentHeight;
   double contentWidth;
 
   requestAuth({ 
-    required this.callback,
+    required this.itemCallback,
+    required this.item,
+    required this.backButton,
     required this.contentHeight,
     required this.contentWidth,
     Key? key 
@@ -24,6 +30,7 @@ class _requestAuthState extends State<requestAuth> {
   };
   String? type;
   int displayvalue = 0;
+  int displayRequestType = 0;
 
   List<String> scopes = [
     "Read only",
@@ -31,6 +38,8 @@ class _requestAuthState extends State<requestAuth> {
     "Metadata only",
     "All access",
   ];
+
+  List<String> httpType = ["GET", "POST", "PUT", "DELETE", "PATCH"];
 
   @override
   Widget build(BuildContext context) {
@@ -48,33 +57,29 @@ class _requestAuthState extends State<requestAuth> {
               alignment: WrapAlignment.center,
               children: [
                 Text("Request: ", style: TextStyle(color: Colors.white)),
-                requestPageButton(
-                  width: widget.contentWidth * 0.3,
-                  height: widget.contentHeight * 0.1,
-                  chosen: chosenType["POST"],
-                  onPressed: (value){
+                DropdownButton(
+                  value: displayRequestType,
+                  onChanged: (int? value){
+                    // type = value.toString();
                     setState(() {
-                      chosenType["POST"] = value;
-                      if(chosenType["POST"] == chosenType["GET"]){
-                        chosenType["GET"] = !(chosenType["GET"])!;
-                      }
+                      displayRequestType = value ?? 0;
                     });
-                  }, 
-                  text: "POST"
-                ),
-                requestPageButton(
-                  width: widget.contentWidth * 0.3,
-                  height: widget.contentHeight * 0.1,
-                  chosen: chosenType["GET"],
-                  onPressed: (value){
-                    setState(() {
-                      chosenType["GET"] = value;
-                      if(chosenType["POST"] == chosenType["GET"]){
-                        chosenType["POST"] = !(chosenType["POST"])!;
-                      }
-                    });
-                  }, 
-                  text: "GET"
+                    
+                  },
+                  items: ActionType.values.map((e) => DropdownMenuItem(
+                      value: ActionType.values.indexOf(e),
+                      child: Text(Item.convert(e))
+                    )).toList(),
+                  selectedItemBuilder: (ctx) {
+                    return ActionType.values.map((e) => Container(
+                      width: widget.contentWidth * 0.2,
+                      decoration: BoxDecoration(
+                        // border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey))
+                      ),
+                      padding: EdgeInsets.all(1),
+                      child: Center(child: Text(Item.convert(e), style: TextStyle(color: Colors.grey), overflow: TextOverflow.ellipsis,)),
+                    )).toList();
+                  },
                 ),
               ],
             ),
@@ -123,6 +128,10 @@ class _requestAuthState extends State<requestAuth> {
                   width: widget.contentWidth * 0.3,
                   height: widget.contentHeight * 0.1,
                   onPressed: (value){
+                    setState(() {
+                      widget.item.authenticating = true;
+                      widget.itemCallback(widget.item);
+                    });
                   }, 
                   text: "Send"
                 ),
@@ -130,7 +139,7 @@ class _requestAuthState extends State<requestAuth> {
                   width: widget.contentWidth * 0.3,
                   height: widget.contentHeight * 0.1,
                   onPressed: (value){
-                    widget.callback();
+                    widget.backButton();
                   }, 
                   text: "Back"
                 ),

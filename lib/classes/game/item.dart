@@ -5,21 +5,53 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Item{
-  int? reqId;
+  dynamic reqId;
   String? name;
-  RequestType? reqType;
-  FileType? fileType;
-  Drives? source;
-  Drives? destination;
-  Encryption? encryption;
+  dynamic reqType;
+  dynamic fileType;
+  dynamic source;
+  dynamic destination;
+  dynamic encryption;
   List<String>? content;
-  ActionType? action;
-  String? sessionTime;
+  dynamic action;
+  dynamic sessionTime;
+  Duration? timeNeeded;
   bool? malicious = false;
+  bool? authenticating = false;
+  bool? authenticated = false;
+  bool? finish = false;
+  bool? success;
+  bool? checking = false;
+  int? score;
+  int? totalScore;
+  String? mainPoint;
+
+  // ignore: prefer_final_fields
+  Map<String, bool> _isFieldCorrect = {
+    "reqId": true,
+    "reqType": true,
+    "fileType": true,
+    "source": true,
+    "destination": true,
+    "encryption": true,
+    "content": true,
+    "action": true,
+    "sessionTime": true,
+  };
+  Map<String, bool>? get getFields => _isFieldCorrect;
+
+  Map<String, bool> _copyOfField = {};
+  Map<String, bool>? get getInitField => _copyOfField;
+
+  void UpdateField(String name, bool value) {
+    if(_isFieldCorrect[name] != null) {
+      _isFieldCorrect[name] = value;
+    }
+  }
 
   Item(
-    this.name, 
   {
+    this.name, 
     this.reqId,
     this.reqType,
     this.fileType,
@@ -29,8 +61,27 @@ class Item{
     this.content,
     this.action,
     this.sessionTime,
+    this.timeNeeded,
     this.malicious,
-  });
+    this.authenticating,
+    this.authenticated,
+    this.finish,
+    this.success,
+    this.score,
+    this.totalScore,
+    this.mainPoint,
+  }){
+    (reqId is int) ? null : UpdateField("reqId", false);
+    (reqType is RequestType) ? null : UpdateField("reqType", false);
+    (fileType is FileType) ? null : UpdateField("fileType", false);
+    (source is Drives) ? null : UpdateField("source", false);
+    (destination is Drives) ? null : UpdateField("destination", false);
+    (encryption is Encryption) ? null : UpdateField("encryption", false);
+    (action is ActionType) ? null : UpdateField("action", false);
+    (sessionTime is DateTime) ? null : UpdateField("sessionTime", false);
+
+    _copyOfField = Map.from(_isFieldCorrect);
+  }
 
   static String _randomMaliciousDrive() {
     return "random";
@@ -55,7 +106,7 @@ class Item{
     List<String> content = dummyContent;
 
     Item item = Item(
-      fileName,
+      name: fileName,
       fileType: fileType,
       source: source,
       destination: destination,

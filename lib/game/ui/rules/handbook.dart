@@ -1,18 +1,31 @@
+import 'package:drive_easy/game/ui/rules/booksPage.dart';
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:googleapis/books/v1.dart';
+import 'package:overlay_tutorial/overlay_tutorial.dart';
 import 'package:page_turn/page_turn.dart';
 
 class Handbook extends StatefulWidget {
   double contentHeight;
   double contentWidth;
-  ValueChanged<int> pageCallback;
-  int? page;
+  ValueChanged<double> pageCallback;
+  double? page;
+  String rulesVersion;
+  bool isTutorialEnabled;
+  List<bool> isTutorialOn;
+  List<OverlayTutorialRectEntry> tutorialOverlaysEntries;
+  ValueChanged<Map> tutorialCallback;
 
   Handbook({ 
     required this.contentHeight,
     required this.contentWidth,
     required this.pageCallback,
+    required this.rulesVersion,
+    required this.isTutorialEnabled,
+    required this.isTutorialOn,
+    required this.tutorialOverlaysEntries,
+    required this.tutorialCallback,
     this.page,
     Key? key 
   }) : super(key: key);
@@ -24,17 +37,18 @@ class Handbook extends StatefulWidget {
 class _HandbookState extends State<Handbook> {
   late ScrollController _scrollController;
   int _page = 0;
-  int _MAX_PAGE = 4;
-
+  int _MAX_PAGE = 0;
+  String _loadedData = "";
   Map<String, Function> _buttons = {};
   Map<String, List<String>> _inBookText = {};
+  List<String> test = [];
 
 
   Future<void> _loadData() async {
-    final _loadedData = await rootBundle.loadString('assets/textFiles/rules.txt');
-    // print(_loadedData);
+    _loadedData = await rootBundle.loadString('assets/textFiles/${widget.rulesVersion}.txt');
 
     List<String> data = _loadedData.split("\n");
+    test = data;
     
     String current = "";
     for (int i=0; i<data.length; i++){
@@ -52,8 +66,9 @@ class _HandbookState extends State<Handbook> {
     }
 
     setState(() {
-      
+      _MAX_PAGE = _inBookText.keys.length;
     });
+    
   }
 
   @override
@@ -61,16 +76,9 @@ class _HandbookState extends State<Handbook> {
     // TODO: implement initState
     super.initState();
     _scrollController = ScrollController(initialScrollOffset: 0);
-
+    _loadData();
+    
     _buttons = {
-      "Right": (){ 
-        if(_page < _MAX_PAGE) _page++;
-        _scrollController.animateTo(widget.contentWidth * 0.8 * _page, duration: Duration(milliseconds: 500), curve: Curves.ease);
-      },
-      "Left": (){ 
-        if(_page > 0) _page--;
-        _scrollController.animateTo(widget.contentWidth * 0.8 * _page, duration: Duration(milliseconds: 500), curve: Curves.ease);
-      },
       "Start": (){ 
         _page = 0;
         _scrollController.animateTo(0, duration: Duration(milliseconds: 500), curve: Curves.ease);
@@ -79,9 +87,12 @@ class _HandbookState extends State<Handbook> {
         _page = _MAX_PAGE;
         _scrollController.animateTo(widget.contentWidth * 0.8 * _page, duration: Duration(milliseconds: 500), curve: Curves.ease);
       },
+      "Policies": (){
+        _page = 1;
+        _scrollController.animateTo(widget.contentWidth * 0.8 * _page, duration: Duration(milliseconds: 500), curve: Curves.ease);
+      }
     };
-
-    _loadData();
+    
   }
 
   @override
@@ -101,7 +112,26 @@ class _HandbookState extends State<Handbook> {
               child: 
               ListView(
                 children: _buttons.entries.map((e) => 
-                  ElevatedButton(
+                  (e.key == "Policies") 
+                  ? OverlayTutorialHole(
+                    enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[5] : false,
+                    overlayTutorialEntry: (widget.isTutorialEnabled) ? widget.tutorialOverlaysEntries[5] : OverlayTutorialRectEntry(),
+                    child: ElevatedButton(
+                      onPressed: (){
+                        e.value();
+                        if (widget.isTutorialEnabled && widget.isTutorialOn[5]) {
+                          setState(() {
+                            widget.isTutorialOn[5] = false;
+                            widget.isTutorialOn[6] = true;
+                          });
+                        }
+                        
+                      }, 
+                      child: Text(e.key)
+                    ),
+                  )
+                  
+                  : ElevatedButton(
                     onPressed: (){e.value();}, 
                     child: Text(e.key)
                   )
@@ -116,46 +146,55 @@ class _HandbookState extends State<Handbook> {
             child: MediaQuery.removePadding(
               context: context,
               removeTop: true,
-              child: ListView(
+              child: ListView.builder(
+                itemCount: _inBookText.keys.length,
                 scrollDirection: Axis.horizontal,
-                // onPageChanged: (value){
-                //   widget.pageCallback(value);
-                // },
                 controller: _scrollController,
-                children: [
-                  for (int k=0; k<=(_inBookText.keys.length + 1) / 2; k+=2)...[
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(width: 5, color: Colors.grey),
-                        color: Colors.white,
-                      ),
-                      height: widget.contentHeight * 0.95,
-                      width: widget.contentWidth * 0.8,
-                      alignment: Alignment.topCenter,
-                      child: Wrap(
-                        alignment: WrapAlignment.start,
-                        direction: Axis.vertical,
-                        children: [
-                          for (int j=k; j<((_inBookText.keys.length < 2) ? _inBookText.keys.length + k : 2 + k); j++)...[
-                            Container(
-                              padding: EdgeInsets.only(top: 5, bottom: 5),
-                              width: widget.contentWidth * 0.38,
-                              child: Text(_inBookText.keys.elementAt(j), style: TextStyle(color: Colors.red, fontSize: 20), textAlign: TextAlign.center,)
-                            ),
-                            
-                            for (var i in _inBookText.values.elementAt(j))...[
-                              Container(
-                                width: widget.contentWidth * 0.38,
-                                child: Text(i, style: TextStyle(color: Colors.black, fontSize: 15),)
-                              )
-                            ],
-                            if (j % 2 == 0) VerticalDivider(thickness: 5,)
-                          ]
+                itemBuilder: (BuildContext context, int index) { 
+                  Widget wrap = Wrap();
+                  try { 
+                    wrap = Wrap(
+                      alignment: WrapAlignment.start,
+                      direction: Axis.vertical,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(top: 5, bottom: 5),
+                          width: widget.contentWidth * 0.38,
+                          child: Text(_inBookText.keys.elementAt(index), style: TextStyle(color: Colors.red, fontSize: 20), textAlign: TextAlign.center,)
+                        ),
+                        for (var i in _inBookText.values.elementAt(index))...[
+                          Container(
+                            width: widget.contentWidth * 0.38,
+                            child: (i.contains("Google Drive")) 
+                            ? OverlayTutorialHole(
+                              enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[6] : false,
+                              overlayTutorialEntry: (widget.isTutorialEnabled) ? widget.tutorialOverlaysEntries[6] : OverlayTutorialRectEntry(),
+                              child: Text(i, style: TextStyle(color: Colors.black, fontSize: 15),)
+                            )
+                            : Text(i, style: TextStyle(color: Colors.black, fontSize: 15),)
+                          )
                         ],
-                      ),
+                      ],
+                    );
+                  } catch (e) {}
+
+                  if(index == _inBookText.keys.length) {
+                    if (widget.isTutorialEnabled) {
+                      _scrollController.animateTo(widget.contentWidth * 0.8 * 2, duration: Duration(milliseconds: 0), curve: Curves.ease);
+                    }
+                  }
+                  return Container(
+                    padding: EdgeInsets.only(left: 10, right: 10),
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 5, color: Colors.grey),
+                      color: Colors.white,
                     ),
-                  ],
-                ],
+                    height: widget.contentHeight * 0.95,
+                    // width: widget.contentWidth * 0.8,
+                    alignment: Alignment.topCenter,
+                    child: wrap,
+                  );
+                }
               ),
             ),
           )

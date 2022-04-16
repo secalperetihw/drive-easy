@@ -1,29 +1,44 @@
 import 'package:drive_easy/classes/game/item.dart';
+import 'package:drive_easy/classes/game/progress.dart';
 import 'package:drive_easy/game/game_home.dart';
 import 'package:drive_easy/game/ui/requestPage/requestApprove.dart';
 import 'package:drive_easy/game/ui/requestPage/requestAuth.dart';
 import 'package:drive_easy/game/ui/requestPage/requestClasses.dart';
 import 'package:drive_easy/game/ui/requestPage/requestDeny.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
+import 'package:overlay_tutorial/overlay_tutorial.dart';
 
 class requestContents extends StatefulWidget {
   GameMain? game;
   Item item;
+  Progress progress;
   ValueChanged<Item> callback;
-  // ValueChanged<int> pageCallback;
+  ValueChanged<int> pageCallback;
   ValueChanged<bool> dataCallback;  
+  ValueChanged<Item> itemCallback;
   int? page;
   double contentHeight;
   double contentWidth;
+  bool isTutorialEnabled;
+  List<bool> isTutorialOn;
+  List<OverlayTutorialRectEntry> tutorialOverlaysEntries;
+  ValueChanged<Map> tutorialCallback;
 
   requestContents({
     required this.game,
     required this.item,
+    required this.progress,
     required this.callback,
     required this.contentHeight,
     required this.contentWidth,
-    // required this.pageCallback,
+    required this.pageCallback,
     required this.dataCallback,
+    required this.itemCallback,
+    required this.isTutorialEnabled,
+    required this.isTutorialOn,
+    required this.tutorialOverlaysEntries,
+    required this.tutorialCallback,
     this.page,
     Key? key,
   }) : super(key: key);
@@ -61,30 +76,60 @@ class _requestContentsState extends State<requestContents> {
 
                   return true;
                 },
-                child: ListView(children: [Container(height: widget.contentHeight, child: Center(
-                  child: RichText(text: TextSpan(
-                    children: [
-                      TextSpan(text: "{\n", style: TextStyle(color: Colors.white),),
-                      TextSpan(text: "  \"Req-id\": ", style: TextStyle(color: Colors.white),),
-                      TextSpan(text: "\"${Item.convert(widget.item.reqId)}\"\n", style: TextStyle(color: Colors.blue),),
-                      TextSpan(text: "  \"Req-type\": ", style: TextStyle(color: Colors.white),),
-                      TextSpan(text: "\"${Item.convert(widget.item.reqType)}\"\n", style: TextStyle(color: Colors.blue),),
-                      TextSpan(text: "  \"File-type\": ", style: TextStyle(color: Colors.white),),
-                      TextSpan(text: "\"${Item.convert(widget.item.fileType)}\"\n", style: TextStyle(color: Colors.blue),),
-                      TextSpan(text: "  \"Source\": ", style: TextStyle(color: Colors.white),),
-                      TextSpan(text: "\"${Item.convert(widget.item.source)}\"\n", style: TextStyle(color: Colors.blue),),
-                      TextSpan(text: "  \"Destination\": ", style: TextStyle(color: Colors.white),),
-                      TextSpan(text: "\"${Item.convert(widget.item.destination)}\"\n", style: TextStyle(color: Colors.blue),),
-                      TextSpan(text: "  \"Encryption\": ", style: TextStyle(color: Colors.white),),
-                      TextSpan(text: "\"${Item.convert(widget.item.encryption)}\"\n", style: TextStyle(color: Colors.blue),),
-                      TextSpan(text: "  \"Action\": ", style: TextStyle(color: Colors.white),),
-                      TextSpan(text: "\"${(widget.item.action == null) ? "undefined" : Item.convert(widget.item.action)}\"\n", style: TextStyle(color: Colors.blue),),
-                      TextSpan(text: "  \"Session-create-time\": ", style: TextStyle(color: Colors.white),),
-                      TextSpan(text: "\"${Item.convert(widget.item.sessionTime)}\"\n", style: TextStyle(color: Colors.blue),),
-                      TextSpan(text: "}", style: TextStyle(color: Colors.white),),
-                    ])),),
-                  )
-                ],),
+                // enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[0] : false,
+                      // overlayTutorialEntry: widget.tutorialOverlaysEntries[0],
+                child: ListView( children: [OverlayTutorialHole(
+                  enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[11] : false,
+                  overlayTutorialEntry: widget.tutorialOverlaysEntries[11],
+                  child: OverlayTutorialHole(
+                    enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[0] : false,
+                    overlayTutorialEntry: widget.tutorialOverlaysEntries[0],
+                    child: Container(
+                      width: widget.contentWidth * 0.4,
+                      height: widget.contentHeight,
+                      child: Center(child: Wrap(children: [
+                        Container(
+                          width: widget.contentWidth * 0.3,
+                          child: RichText(text: TextSpan(children: [
+                            TextSpan(text: "{\n", style: TextStyle(color: Colors.white),),
+                            TextSpan(text: "  \"Req-id\": ", style: TextStyle(color: Colors.white),),
+                            TextSpan(text: "\"${Item.convert(widget.item.reqId)}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["reqId"]!)) ? Colors.red : Colors.blue),),
+                            TextSpan(text: "  \"Req-type\": ", style: TextStyle(color: Colors.white),),
+                            TextSpan(text: "\"${Item.convert(widget.item.reqType)}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["reqType"]!)) ? Colors.red : Colors.blue),),
+                            TextSpan(text: "  \"File-type\": ", style: TextStyle(color: Colors.white),),
+                            TextSpan(text: "\"${Item.convert(widget.item.fileType)}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["fileType"]!)) ? Colors.red : Colors.blue),),
+                            TextSpan(text: "  \"Source\": ", style: TextStyle(color: Colors.white),),
+                            TextSpan(text: "\"${Item.convert(widget.item.source)}\"", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["source"]!)) ? Colors.red : Colors.blue),),
+                            
+                          ])),
+                        ),
+                        Container(
+                          width: widget.contentWidth * 0.3,
+                          child: OverlayTutorialHole(
+                            enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[3] : false,
+                            overlayTutorialEntry: widget.tutorialOverlaysEntries[3],
+                            child: RichText(text: TextSpan(children: [
+                              TextSpan(text: "  \"Destination\": ", style: TextStyle(color: Colors.white),),
+                              TextSpan(text: "\"${Item.convert(widget.item.destination)}\"", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["destination"]!)) ? Colors.red : Colors.blue),),
+                            ])),
+                          ),
+                        ),
+                        Container(
+                          width: widget.contentWidth * 0.3,
+                          child: RichText(text: TextSpan(children: [
+                            TextSpan(text: "  \"Encryption\": ", style: TextStyle(color: Colors.white),),
+                            TextSpan(text: "\"${Item.convert(widget.item.encryption)}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["encryption"]!)) ? Colors.red : Colors.blue),),
+                            TextSpan(text: "  \"Action\": ", style: TextStyle(color: Colors.white),),
+                            TextSpan(text: "\"${(widget.item.action == null) ? "undefined" : Item.convert(widget.item.action)}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["action"]!)) ? Colors.red : Colors.blue),),
+                            TextSpan(text: "  \"Session-create-time\": ", style: TextStyle(color: Colors.white),),
+                            TextSpan(text: "\"${Jiffy(widget.item.sessionTime as DateTime).format("MM-dd hh:mm")}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["sessionTime"]!)) ? Colors.red : Colors.blue),),
+                            TextSpan(text: "}", style: TextStyle(color: Colors.white),),
+                          ])),
+                        ),],),
+                      ),
+                    ),
+                  ),
+                ),],),
               ),
             )
           ),
@@ -93,7 +138,7 @@ class _requestContentsState extends State<requestContents> {
             height: widget.contentHeight,
             child: PageView(
               onPageChanged: (page){
-                // widget.pageCallback(page);
+                widget.page = page;
               },
               physics: NeverScrollableScrollPhysics(),
               controller: pageController,
@@ -106,47 +151,83 @@ class _requestContentsState extends State<requestContents> {
                         requestPageButton(
                           width: widget.contentWidth * 0.25,
                           height: widget.contentHeight * 0.2,
+                          color: (widget.progress.level! >= 1) ? null : Colors.grey.shade700,
                           onPressed: (value){
-                            setState(() {
-                              widget.page = 1;
-                              pageController!.animateToPage(1, duration: Duration(milliseconds: 500), curve: Curves.ease);
-                            });
+                            if(widget.item.finish ?? false) return;
+                            if(widget.progress.level! >= 1) {
+                              setState(() {
+                                widget.page = 1;
+                                pageController!.animateToPage(1, duration: Duration(milliseconds: 500), curve: Curves.ease);
+                              });
+                            }
                           },
                           text: "Authorize",
                         ),
                         requestPageButton(
                           width: widget.contentWidth * 0.25,
                           height: widget.contentHeight * 0.2,
+                          color: (widget.progress.level! >= 2) ? null : Colors.grey.shade700,
                           onPressed: (value){
+                            // if(widget.item.finish ?? false) return;
                             // pageController!.jumpToPage(1);
-                            if (widget.dataCallback != null){
-                              widget.dataCallback(true);
+                            if(widget.progress.level! >= 2) {
+                              if (widget.dataCallback != null){
+                                widget.dataCallback(true);
+                              }
                             }
 
                           },
                           text: "Data",
                         ),
-                        requestPageButton(
-                          width: widget.contentWidth * 0.25,
-                          height: widget.contentHeight * 0.2,
-                          onPressed: (value){
-                            setState(() {
-                              widget.page = 2;
-                              pageController!.animateToPage(2, duration: Duration(milliseconds: 500), curve: Curves.ease);
-                            });
-                          },
-                          text: "Deny",
+                        OverlayTutorialHole(
+                          enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[8] : false,
+                          overlayTutorialEntry: widget.tutorialOverlaysEntries[8],
+                          child: requestPageButton(
+                            width: widget.contentWidth * 0.25,
+                            height: widget.contentHeight * 0.2,
+                            onPressed: (value){
+                              if(widget.item.finish ?? false) return;
+                              setState(() {
+                                if (widget.isTutorialEnabled && widget.isTutorialOn[8]) {
+                                  widget.isTutorialOn[8] = false;
+                                  widget.isTutorialOn[9] = true;
+                                  widget.tutorialCallback({"isTutorialOn": widget.isTutorialOn});
+                                }
+                                widget.page = 2;
+                                pageController!.animateToPage(2, duration: Duration(milliseconds: 500), curve: Curves.ease);
+                              });
+                            },
+                            text: "Deny",
+                          ),
                         ),
-                        requestPageButton(
-                          width: widget.contentWidth * 0.25,
-                          height: widget.contentHeight * 0.2,
-                          onPressed: (value){
-                            setState(() {
-                              widget.page = 3;
-                              pageController!.animateToPage(3, duration: Duration(milliseconds: 500), curve: Curves.ease);
-                            });
-                          },
-                          text: "Approve",
+                        OverlayTutorialHole(
+                          enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[12] : false,
+                          overlayTutorialEntry: widget.tutorialOverlaysEntries[12],
+                          child: OverlayTutorialHole(
+                            enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[1] : false,
+                            overlayTutorialEntry: widget.tutorialOverlaysEntries[1],
+                            child: requestPageButton(
+                              width: widget.contentWidth * 0.25,
+                              height: widget.contentHeight * 0.2,
+                              onPressed: (value){
+                                if(widget.item.finish ?? false) return;
+                                setState(() {
+                                  if (widget.isTutorialEnabled && widget.isTutorialOn[1]) {
+                                    widget.isTutorialOn[1] = false;
+                                    widget.isTutorialOn[2] = true;
+                                    widget.tutorialCallback({"isTutorialOn": widget.isTutorialOn});
+                                  } else if (widget.isTutorialOn[12]) {
+                                    widget.isTutorialOn[12] = false;
+                                    widget.isTutorialOn[13] = true;
+                                    widget.tutorialCallback({"isTutorialOn": widget.isTutorialOn});
+                                  }
+                                  widget.page = 3;
+                                  pageController!.animateToPage(3, duration: Duration(milliseconds: 500), curve: Curves.ease);
+                                });
+                              },
+                              text: "Approve",
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -162,12 +243,19 @@ class _requestContentsState extends State<requestContents> {
                       icon: Icon(Icons.arrow_back, color: Colors.white,),
                     ),
                     requestAuth(
-                      callback: (){
+                      backButton: (){
                         // widget.page = 0;
                         pageController!.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.ease);
                       },
                       contentHeight: widget.contentHeight,
                       contentWidth: widget.contentWidth * 0.6,
+                      item: widget.item,
+                      itemCallback: (value) {
+                        setState(() {
+                          widget.item = value;
+                          widget.itemCallback(value);
+                        });
+                      },
                     ),
                   ],
                 ),
@@ -181,6 +269,33 @@ class _requestContentsState extends State<requestContents> {
                       icon: Icon(Icons.arrow_back, color: Colors.white,),
                     ),
                     requestDeny(
+                      progress: widget.progress,
+                      isTutorialEnabled: widget.isTutorialEnabled,
+                      isTutorialOn: widget.isTutorialOn,
+                      tutorialOverlaysEntries: widget.tutorialOverlaysEntries,
+                      tutorialCallback: (value) {
+                        if (value["isTutorialEnabled"] != null) {
+                          setState(() {
+                            widget.isTutorialEnabled = value["isTutorialEnabled"];
+                          });
+                        }
+                        if (value["isTutorialOn"] != null) {
+                          setState(() {
+                            widget.isTutorialOn = value["isTutorialOn"];
+                          });
+                        }
+                        if (value["tutorialOverlaysEntries"] != null) {
+                          setState(() {
+                            widget.tutorialOverlaysEntries = value["tutorialOverlaysEntries"];
+                          });
+                        }
+
+                        widget.tutorialCallback({
+                          "isTutorialEnabled": widget.isTutorialEnabled,
+                          "isTutorialOn": widget.isTutorialOn,
+                          "tutorialOverlaysEntries": widget.tutorialOverlaysEntries,
+                        });
+                      },
                       contentHeight: widget.contentHeight,
                       contentWidth: widget.contentWidth * 0.6,
                       item: widget.item,
@@ -188,8 +303,12 @@ class _requestContentsState extends State<requestContents> {
                         // widget.page = 0;
                         pageController!.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.ease);
                       },
-                      onComplete: (value){
-                        widget.item = value;
+                      itemCallback: (value){
+                        setState(() {
+                          widget.item = value;
+                          widget.itemCallback(value);
+                        });
+                        
                       },
                     ),
                   ],
@@ -204,6 +323,40 @@ class _requestContentsState extends State<requestContents> {
                       icon: Icon(Icons.arrow_back, color: Colors.white,),
                     ),
                     requestApprove(
+                      progress: widget.progress,
+                      isTutorialEnabled: widget.isTutorialEnabled,
+                      isTutorialOn: widget.isTutorialOn,
+                      tutorialOverlaysEntries: widget.tutorialOverlaysEntries,
+                      tutorialCallback: (value) {
+                        if (value["isTutorialEnabled"] != null) {
+                          setState(() {
+                            widget.isTutorialEnabled = value["isTutorialEnabled"];
+                          });
+                        }
+                        if (value["isTutorialOn"] != null) {
+                          setState(() {
+                            widget.isTutorialOn = value["isTutorialOn"];
+                          });
+                        }
+                        if (value["tutorialOverlaysEntries"] != null) {
+                          setState(() {
+                            widget.tutorialOverlaysEntries = value["tutorialOverlaysEntries"];
+                          });
+                        }
+
+                        widget.tutorialCallback({
+                          "isTutorialEnabled": widget.isTutorialEnabled,
+                          "isTutorialOn": widget.isTutorialOn,
+                          "tutorialOverlaysEntries": widget.tutorialOverlaysEntries,
+                        });
+                      },
+                      item: widget.item,
+                      itemCallback: (value) {
+                        setState(() {
+                          widget.item = value;
+                          widget.itemCallback(value);
+                        });
+                      },
                       callback: (){
                         // widget.page = 0;
                         pageController!.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.ease);

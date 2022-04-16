@@ -2,6 +2,7 @@ import 'package:drive_easy/classes/game/progress.dart';
 import 'package:drive_easy/classes/user.dart';
 import 'package:drive_easy/game/game_home.dart';
 import 'package:drive_easy/static/emails.dart';
+import 'package:drive_easy/static/requestsOnBoard.dart';
 import 'package:flutter/material.dart';
 import 'package:googleapis/streetviewpublish/v1.dart';
 
@@ -13,15 +14,7 @@ final game = GameMain();
 
 final GlobalKey<ScaffoldMessengerState> snackbarKey = GlobalKey<ScaffoldMessengerState>();
 
-Progress progress = Progress(
-  level: 1,
-  day: 1,
-  totalScore: 1,
-  totalFailed: 0,
-  totalSuccess: 0,
-  rating: 0,
-  emails: emailDatabase,
-);
+Progress progress = Progress.createDefault();
 
 enum Drives {
   googleDrive,

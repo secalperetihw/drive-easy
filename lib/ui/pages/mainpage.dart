@@ -1,6 +1,7 @@
 import 'package:drive_easy/game/game_home.dart';
 import 'package:drive_easy/game/ui/computerPage.dart';
 import 'package:drive_easy/game/ui/requestPage/request.dart';
+import 'package:drive_easy/global.dart';
 import 'package:drive_easy/ui/pages/home.dart';
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
@@ -92,7 +93,7 @@ class _MainPageState extends State<MainPage> {
             ListTile(
               title: const Text("debug"),
               onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (ctx) => ComputerMainPage()));
+                Navigator.push(context, MaterialPageRoute(builder: (ctx) => ComputerMainPage(progress: progress,)));
               }
             )
           ],

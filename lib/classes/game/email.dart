@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
+
 class GameEmail {
+  int? id;
   String? content;
   String? title;
   String? from;
@@ -7,8 +10,10 @@ class GameEmail {
   String? dear;
   bool? read;
   DateTime? time;
+  List<TextStyle?>? style;
 
   GameEmail({
+    this.id,
     this.content,
     this.title,
     this.from,
@@ -17,6 +22,7 @@ class GameEmail {
     this.dear,
     this.read,
     this.time,
+    this.style,
   });
 
   Map<dynamic, dynamic> toJson() {

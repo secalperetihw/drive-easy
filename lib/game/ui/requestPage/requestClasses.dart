@@ -1,6 +1,7 @@
 import 'package:drive_easy/classes/game/item.dart';
 import 'package:drive_easy/game/game_home.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 
 class requestPageButton extends StatelessWidget {
   ValueChanged<bool> onPressed;
@@ -9,6 +10,7 @@ class requestPageButton extends StatelessWidget {
   double? height;
   bool? chosen = false;
   EdgeInsetsGeometry? padding;
+  Color? color;
 
   requestPageButton({
     required this.onPressed,
@@ -17,6 +19,7 @@ class requestPageButton extends StatelessWidget {
     this.width,
     this.height,
     this.padding,
+    this.color,
     Key? key,
   }) : super(key: key);
 
@@ -28,7 +31,7 @@ class requestPageButton extends StatelessWidget {
         width: width ??= MediaQuery.of(context).size.width * 0.2,
         height: height ??= 50,
         decoration: BoxDecoration(
-          border: Border.all(color: (chosen ?? false) ? Colors.blue : Colors.grey)
+          border: Border.all(color: color ??= ((chosen ?? false) ? Colors.blue : Colors.white))
         ),
         child: ElevatedButton(
           onPressed: (){
@@ -41,7 +44,7 @@ class requestPageButton extends StatelessWidget {
                 text, 
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: (chosen ?? false) ? Colors.blue : Colors.white,
+                  color: color ??= ((chosen ?? false) ? Colors.blue : Colors.white),
                   
                 ),
               )
@@ -60,10 +63,16 @@ class requestPageButton extends StatelessWidget {
 class GameAnnoncement extends StatefulWidget {
   GameMain? game;
   Item? item;
+  String? score;
+  DateTime? time;
+  String? annoncement;
 
   GameAnnoncement({ 
     this.game,
     this.item,
+    this.score,
+    this.time,
+    this.annoncement,
     Key? key 
   }) : super(key: key);
 
@@ -89,9 +98,9 @@ class _GameAnnoncementState extends State<GameAnnoncement> {
               textAlign: TextAlign.center,
               text: TextSpan(
                 children: [
-                  TextSpan(text: "Score: ", style: TextStyle(color: Colors.white),),
-                  TextSpan(text: "  Time now: ", style: TextStyle(color: Colors.white),),
-                  TextSpan(text: "  Date: ", style: TextStyle(color: Colors.white),),
+                  TextSpan(text: "Score: ${widget.score ?? ""}", style: TextStyle(color: Colors.white),),
+                  TextSpan(text: "  Time: ", style: TextStyle(color: Colors.white),),
+                  TextSpan(text: Jiffy(widget.time ?? DateTime.now()).format("MM-dd h:mm"), style: TextStyle(color: Colors.blue),),
                 ]
               ),
             ),
@@ -103,7 +112,12 @@ class _GameAnnoncementState extends State<GameAnnoncement> {
               textAlign: TextAlign.center,
               text: TextSpan(
                 children: [
-                  TextSpan(text: "Annoncement................... ", style: TextStyle(color: Colors.blue),),
+                  TextSpan(
+                    text: (widget.item?.authenticating ?? false) 
+                    ? widget.annoncement
+                    : "", 
+                    style: TextStyle(color: Colors.blue),
+                  ),
                 ]
               ),
             ),
