@@ -71,8 +71,26 @@ Map<String, List<GameEmail>> emailDatabase = {
   "level1": [
     GameEmail(
       id: 0,
+      content: ("New updated on handbook:\n")
+        + ("  - Chapter: Special Policy updated"),
+      title: "Handbook updated.",
+      from: "System",
+      to: "user",
+      cc: "",
+      dear: "Auto generated email:\n",
+      read: false,
+      time: DateTime(2022, 4, 2, 09, 00),
+      style: [
+        null,
+        TextStyle(color: Colors.blue),
+      ]
+    ),
+  ],
+  "level2": [
+    GameEmail(
+      id: 0,
       content: ("New policy updated!\n")
-        + ("  Due to needed by our partners, authentication are need for every packages!\n")
+        + ("  Due to needed by our partners, Authorization are need for every packages!\n")
         + ("  Check out the handbook for more details!\n")
         + ("\n")
         + ("\n")
@@ -84,20 +102,25 @@ Map<String, List<GameEmail>> emailDatabase = {
       cc: "Drive-Easy-Emplyees",
       dear: "Dear new employee, \n",
       read: false,
-      time: DateTime(2022, 4, 2, 09, 00),
+      time: DateTime(2022, 4, 3, 09, 00),
     ),
     GameEmail(
       id: 0,
       content: ("New updated on handbook:\n")
-        + ("  - \n")
-        + ("  - \n"),
+        + ("  - Chapter: Autheication added\n")
+        + ("  - Chapter: Special Policy updated"),
       title: "Handbook updated.",
       from: "System",
       to: "user",
       cc: "",
       dear: "Auto generated email:\n",
       read: false,
-      time: DateTime(2022, 4, 2, 09, 00),
+      time: DateTime(2022, 4, 3, 09, 00),
+      style: [
+        null,
+        TextStyle(color: Colors.blue),
+        TextStyle(color: Colors.blue),
+      ]
     ),
   ]
 };

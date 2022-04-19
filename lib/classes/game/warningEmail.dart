@@ -25,7 +25,7 @@ class WarningEmail extends GameEmail {
     required int id, 
     required Map<String, bool> itemField,
     required int wrongTimes, 
-    required DateTime time
+    required DateTime time,
   }) {
     String s = "";
     List<TextStyle?> tmp = [
@@ -43,6 +43,7 @@ class WarningEmail extends GameEmail {
         check = false;
       }
     });
+
     if (check) {
       s += "  - The package content has nothing suspicious.\n";
     }
@@ -62,8 +63,6 @@ class WarningEmail extends GameEmail {
         null,
       ]
     );
-
-    print(itemField);
 
     return WarningEmail(
       id: id,
@@ -89,6 +88,45 @@ class WarningEmail extends GameEmail {
       wrongTimes: wrongTimes,
       read: false,
       style: tmp
+    );
+  }
+
+  static WarningEmail wrongReason({
+    required int id, 
+    required DateTime time,
+  }) {
+    return WarningEmail(
+      id: id,
+      title: "Note: a package score deducted",
+      from: "Drive easy",
+      to: "Player",
+      content: ("This is a automating generated email.\n")
+      + ("  A previous packages was detected to be wrongly proceeded by you.\n")
+      + ("  reqID: \n")
+      + ("  $id\n")
+      + ("  What's wrong: \n")
+      + ("  Incorrect reason chosen.\n")
+      + ("  Score will be deducted for each incorrect reasons.\n ")
+      + ("\n")
+      + ("\n")
+      + ("Best regards,\n")
+      + ("Drive easy\n"),
+      dear: "Dear employee, \n",
+      time: time,
+      read: false,
+      style: [
+        null,
+        null,
+        null,
+        TextStyle(color: Colors.red),
+        null,
+        TextStyle(color: Colors.red),
+        null,
+        null,
+        null,
+        null,
+        null,
+      ]
     );
   }
 }

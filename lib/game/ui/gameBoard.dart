@@ -65,6 +65,13 @@ class _GameBoardPageState extends State<GameBoardPage> {
                       onTap: () async {
                         
                         await Navigator.push(context, MaterialPageRoute(builder: (context) => RequestMainPage(
+                          tutorial: (widget.progress.tutorial!["FirstPlay"]! && widget.progress.level == 0) 
+                          ? true 
+                          : (widget.progress.tutorial!["Authorization"]! && widget.progress.level == 1)
+                            ? true
+                            : (widget.progress.tutorial!["Data"]! && widget.progress.level == 2)
+                              ? true
+                              : false,
                           tutorialOffset: e.reqId,
                           itemCallback: (value) {
                             setState(() {
@@ -120,18 +127,6 @@ class _GameBoardPageState extends State<GameBoardPage> {
                               TextSpan(text: "${e.timeNeeded?.inHours.toString()} hours\n"),
                               
                             ]),),
-                            // if (e.reqId == 0 || e.reqId == 1) ...[
-                            //   OverlayTutorialHole(
-                            //     enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[4] : false,
-                            //     overlayTutorialEntry: widget.tutorialOverlaysEntries[4],
-                            //     child: RichText(text: TextSpan(style: TextStyle(color: (e.finish ?? false) ? Colors.grey : Colors.white), children: [
-                            //       if (e.finish ?? false)...[
-                            //         TextSpan(text: "Score: ", style: TextStyle(color: Colors.grey)),
-                            //         TextSpan(text: "${e.score}/${e.totalScore}"),
-                            //       ]
-                            //     ]),),
-                            //   ),
-                            // ] else 
                             if (e.finish ?? false) ...[
                               RichText(text: TextSpan(style: TextStyle(color: (e.finish ?? false) ? Colors.grey : Colors.white), children: [
                                 TextSpan(text: "Score: ", style: TextStyle(color: Colors.grey)),

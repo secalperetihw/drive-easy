@@ -1,5 +1,13 @@
 import 'package:drive_easy/classes/game/endLevelNotifier.dart';
 import 'package:drive_easy/classes/game/warningEmail.dart';
+import 'package:drive_easy/documents/Authorization_Whats_important.dart';
+import 'package:drive_easy/documents/OAuth2.dart';
+import 'package:drive_easy/documents/Relation_between_action_and_reqtype.dart';
+import 'package:drive_easy/documents/SSO.dart';
+import 'package:drive_easy/documents/What_is_Authoriaztion.dart';
+import 'package:drive_easy/documents/What_is_Encryption.dart';
+import 'package:drive_easy/documents/What_is_POST_GET.dart';
+import 'package:drive_easy/documents/Why_correct_info_important.dart';
 import 'package:drive_easy/game/ui/gameBoard.dart';
 import 'package:drive_easy/game/ui/gameEmailPage.dart';
 import 'package:drive_easy/game/ui/report.dart';
@@ -7,7 +15,6 @@ import 'package:drive_easy/classes/game/email.dart';
 import 'package:drive_easy/classes/game/item.dart';
 import 'package:drive_easy/classes/game/progress.dart';
 import 'package:drive_easy/game/game_home.dart';
-import 'package:drive_easy/game/ui/requestPage/requestClasses.dart';
 import 'package:drive_easy/game/ui/rules/handbook.dart';
 import 'package:drive_easy/global.dart';
 import 'package:drive_easy/static/emails.dart';
@@ -17,6 +24,7 @@ import 'package:flutter/services.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:tutorial/tutorial.dart';
 import 'package:overlay_tutorial/overlay_tutorial.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ComputerMainPage extends StatefulWidget {
   GameMain? game;
@@ -54,15 +62,16 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
   bool _isTutorialEnabled = true;
   List<bool> _isTutorialOn = [];
   List<OverlayTutorialRectEntry> tutorialOverlaysEntries = [];
+  bool readyToNextLevel = false;
 
   @override
   void initState() {
     super.initState();
     
     widget.item ??= Item.generate();
-    widget.item?.reqId = 1;
-    widget.item?.sessionTime = DateTime(2022, 4, 1, 09, 00);
-    widget.item?.reqType = RequestType.uplaod;
+    // widget.item?.reqId = 1;
+    // widget.item?.sessionTime = DateTime(2022, 4, 1, 09, 00);
+    // widget.item?.reqType = RequestType.uplaod;
 
     gameProgress = Progress.createDefault();
     display = EmailPage(
@@ -302,10 +311,7 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
         bool check = false;
         setState(() {
           timeNow = timeNow.add(value);
-          check = endLevelLayout.valueChanges(
-            finishCount: endLevelLayout.finishCount + 1,
-            time: timeNow
-          );
+          
         });
         if (check){
           endPopup();
@@ -316,20 +322,29 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
           // widget.item = value;
           
         });
+
+        if (value.wrongDenyReason ?? false) {
+          setState(() {
+            gameProgress.emails!.add(
+              WarningEmail.wrongReason(
+                id: value.reqId,
+                time: timeNow,
+              )
+            );
+          });
+        }
         
         if (!(value.success ?? true)) {
           setState(() {
             gameProgress.totalFailed = gameProgress.totalFailed! + 1;
             wrongTimes++;
-            // widget.progress.emails!.add(
-            //   WarningEmail.defaultStyle(widget.item!.reqId, widget.item!.getFields!, wrongTimes)
-            // );
             gameProgress.emails!.add(
               WarningEmail.defaultStyle(
                 id: value.reqId,
                 itemField: value.getInitField!, 
                 wrongTimes: wrongTimes,
-                time: timeNow
+                time: timeNow,
+                
               )
             );
             emailIcon = Icons.mark_email_unread;
@@ -353,6 +368,17 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
           });
         } else {
           gameProgress.totalSuccess = gameProgress.totalSuccess! + 1;
+        }
+
+        // check all finished or not
+        bool check = true;
+        for (var e in gameProgress.requests!) {
+          if (!(e.finish ?? false)) check = false;
+        }
+        if (check){
+          setState(() {
+            readyToNextLevel = true;
+          });
         }
       },
     );
@@ -409,8 +435,7 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
                             await showDialog<void>(
                               context: context,
                               barrierDismissible: false, // user must tap button!
-                              builder: (BuildContext context) { 
-                              
+                              builder: (BuildContext context) {
                                 return AlertDialog(
                                   title: Text("Exit"),
                                   content: Text("Are you sure to exit?"),
@@ -508,7 +533,7 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
                                 tutorialCallback: (value) {
                                   
                                 },
-                                rulesVersion: "rules-level1",
+                                rulesVersion: "rules-version" + (gameProgress.level ?? 0).toString(),
                                 contentHeight: MediaQuery.of(context).size.height * 0.75,
                                 contentWidth: MediaQuery.of(context).size.width * 0.9,
                                 pageCallback: (value) { 
@@ -557,20 +582,66 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
                         ),
                         GestureDetector(
                           onTap: () async {
-                            endPopup();
+                            if (readyToNextLevel) {
+                              bool exit = false;
+                              await showDialog<void>(
+                                context: context,
+                                barrierDismissible: false, // user must tap button!
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("Next day"),
+                                    content: Text("Are you sure to end the day?"),
+                                    actions: [
+                                      TextButton(
+                                        onPressed:(){
+                                          exit = true;
+                                          Navigator.pop(context);
+                                        }, 
+                                        child: Text("Yes")
+                                      ),
+                                      TextButton(
+                                        onPressed:(){
+                                          exit = false;
+                                          Navigator.pop(context);
+                                        }, 
+                                        child: Text("No")
+                                      )
+                                    ],
+                                  );
+                                }
+                              );
+                              if(exit){
+                                endPopup();
+                                setState(() {
+                                  // gameProgress.chapter = ((gameProgress.level ?? 0) + 1) ~/ 2;
+                                  readyToNextLevel = false;
+                                });
+                              }
+                            }
+                            else {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: const Text("You didn't finish all tasks today."),
+                                duration: const Duration(seconds: 3),
+                                action: SnackBarAction(
+                                  label: 'OK',
+                                  onPressed: () { },
+                                ),
+                              ));
+                            }
                           },
                           child: Container(
                             padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
                             decoration: BoxDecoration(
                               border: null,
                             ),
-                            child: Icon(Icons.skip_next, color: Colors.white,),
+                            child: Icon(Icons.skip_next, color: (readyToNextLevel) ? Colors.green : Colors.white,),
                           ),
                         ),
                         GestureDetector(
                           onTap: (){
                             setState(() {
                               _isTutorialEnabled = false;
+                              gameProgress.tutorial!["FirstPlay"] = false;
                             });
                           },
                           child: Container(
@@ -607,7 +678,11 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext ctx) { 
       
-        return dialog(gameProgress.level ?? 0, ctx);
+        return dialog(
+          level: gameProgress.level ?? 0, 
+          ctx: ctx,
+          currentContext: context
+        );
       }
     );
     setState(() {
@@ -619,7 +694,7 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
           gameProgress.emails!.add(email);
         }
       } catch(e){ print(e); }
-      gameProgress.requests = List.from(requestsOnBoard["level0"]!);
+      gameProgress.requests = List.from(requestsOnBoard[s]!);
       //requestsOnBoard[s];
       timeNow = DateTime(timeNow.year, timeNow.month, timeNow.day + 1, 09, 00, 00);
       _selectedIndex = 4;
@@ -639,34 +714,119 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
     }
   }
 
-  Widget dialog(int level, BuildContext ctx) {
-    switch (level) {
-      case 0:
-        return Dialog(
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.8,
-            width: MediaQuery.of(context).size.width * 0.8,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15)
-            ),
-            child: ListView(children: [
-              Container(
-                width: MediaQuery.of(context).size.width * 0.7,
-                child: Center(child: RichText(textAlign: TextAlign.center, text: TextSpan(style: TextStyle(color: Colors.black), children: [
-                  TextSpan(text: "Day ${gameProgress.day.toString()} tasks end\n", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, height: 2)),
-                  TextSpan(text: "${gameProgress.successCount().toString()}/${gameProgress.requests?.length.toString()} tasks finished\n"),
-                  TextSpan(text: "Rating: ${gameProgress.rating.toString()}\n"),
-                ])),)
-              ),
-              Center(
-                child: Wrap(children: [
-                  ElevatedButton(onPressed: () => Navigator.pop(ctx), child: Text("Continue"))
-                ],),
-              )
-            ],),
+  Widget dialog({required int level, required BuildContext ctx, required BuildContext currentContext}) {
+    int _page = 0;
+    PageController pageController = PageController(initialPage: _page);
+    
+    Widget summary = ListView(children: [
+      Container(
+        width: MediaQuery.of(currentContext).size.width * 0.7,
+        child: Center(child: RichText(textAlign: TextAlign.center, text: TextSpan(style: TextStyle(color: Colors.black, height: 2), children: [
+          TextSpan(text: "Day ${gameProgress.day.toString()} end\n", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, height: 2)),
+          TextSpan(text: "Overall Rating: ${gameProgress.rating.toString()}\n"),
+          TextSpan(text: "tasks finished: ${gameProgress.successCount().toString()}/${gameProgress.requests?.length.toString()}\n"),
+          TextSpan(text: "Score: ${gameProgress.scoreCount().toString()}/${gameProgress.totalScore}\n"),
+        ])),)
+      ),
+      Padding(padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10), child: Divider(color: Colors.black38,)),
+      Center(child: Wrap(children: [ElevatedButton(onPressed: () {
+        setState(() {
+          _page = 1;
+          pageController.animateToPage(_page, duration: Duration(milliseconds: 500), curve: Curves.ease);
+        });
+      }, child: Text("Next"))],),),
+    ],);
+
+    Widget cover({required List<Widget> children}) {
+      List<Widget> widgets = [summary];
+      widgets.addAll(children);
+
+      return Dialog(
+        child: Container(
+          height: MediaQuery.of(currentContext).size.height * 0.8,
+          width: MediaQuery.of(currentContext).size.width * 0.8,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15)
           ),
-        );
+          child: PageView(
+            controller: pageController,
+            children: widgets,
+          ),
+        ),
+      );
+    }
+
+    Widget nextLevel({required List<TextSpan> children, String? text}) {
+      return ListView(children: [
+        Center(child: RichText(textAlign: TextAlign.center, text: TextSpan(style: TextStyle(color: Colors.black, height: 2), children: const [
+          TextSpan(text: "Now let's move on to next level\n", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, height: 2)),
+        ])),),
+        Center(child: RichText(textAlign: TextAlign.start, text: TextSpan(style: TextStyle(color: Colors.black, height: 2), children: children)),),
+        Padding(padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10), child: Divider(color: Colors.black38,)),
+        Center(child: Wrap(children: [ElevatedButton(onPressed: () {
+          Navigator.pop(ctx);
+        }, child: Text(text ?? "Next Level"))],),),
+        
+      ],);
+    }
+
+    Function onpress(int page) {
+      return () => setState(() {
+        _page = page;
+        pageController.animateToPage(_page, duration: Duration(milliseconds: 500), curve: Curves.ease);
+      });
+    }
+
+    switch (level) {
+      case 0: 
+        return cover(children: [
+          Why_correct_info_important(onpress: onpress(2)),
+          
+          What_is_POST_GET(onpress: onpress(3)),
+          
+          What_is_Encryption(
+            width: MediaQuery.of(currentContext).size.width * 0.6,
+            onpress: onpress(4)
+          ),
+          
+          nextLevel(children: [
+
+          ])
+        ]);
+      case 1:
+        return cover(children: [
+          Relation_between_action_and_reqtype(onpress: onpress(2)),
+
+          nextLevel(children: [
+            TextSpan(text: "Next chapter, we will explore on ",),
+            TextSpan(text: "Authorization", style: TextStyle(color: Colors.red)),
+            TextSpan(text: "\nWhich is about giving permission.",),
+          ])
+        ]);
+      case 2:
+        return cover(children: [
+          What_is_Authorization(onpress: onpress(2)),
+
+          Authorization_Whats_important(onpress: onpress(3)),
+
+          nextLevel(children: [
+            TextSpan(text: "Next chapter, we will explore on ",),
+            TextSpan(text: "Continue of Authorization", style: TextStyle(color: Colors.red)),
+          ])
+        ]);
+      case 3:
+        return cover(children: [
+          OAuth2(onpress: onpress(2)),
+
+          SSO(onpress: onpress(3)),
+
+          nextLevel(children: [
+            TextSpan(text: "Next chapter, we will explore on ",),
+            TextSpan(text: "Data Encryption", style: TextStyle(color: Colors.red)),
+            TextSpan(text: "\nWhich is about securing data transfer",),
+          ])
+        ]);
     }
     return Container();
   }

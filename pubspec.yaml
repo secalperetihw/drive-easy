@@ -31,18 +31,18 @@ dependencies:
     sdk: flutter
 
   firebase_core: ^1.12.0
-  firebase_auth: ^3.3.6
-  cloud_firestore: ^3.1.7
+  firebase_auth: ^3.3.14
+  cloud_firestore: ^3.1.12
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  google_sign_in: ^5.2.3
+  google_sign_in: ^5.3.0
   googleapis: ^8.1.0
   extension_google_sign_in_as_googleapis_auth: ^2.0.4
   fluent_ui: ^3.8.0
-  firebase_app_check: ^0.0.6+5
+  firebase_app_check: ^0.0.6+9
   flutter_onedrive: ^1.0.0
-  icloud_storage: ^0.2.2
+  icloud_storage: ^1.0.0
   flame: ^1.0.0
   flame_svg: ^1.0.0
   http: ^0.13.4
@@ -50,12 +50,11 @@ dependencies:
   file_picker: ^4.5.0
   path_provider: ^2.0.9
   infinity_page_view: ^1.0.0
-  page_turn: ^1.0.1
-  better_page_turn: ^0.0.6
   jiffy: ^5.0.0
   provider: ^6.0.2
   tutorial: ^1.0.9
   overlay_tutorial: ^2.2.2
+  url_launcher: ^6.0.20
 
 dev_dependencies:
   flutter_test:
@@ -83,9 +82,10 @@ flutter:
   assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
-    - assets/images/flatboy/
+    # - assets/images/flatboy/
     - assets/images/drives/
     - assets/images/background/
+    - assets/images/tutorial/
     - assets/images/icons/images/
     - assets/textFiles/
 

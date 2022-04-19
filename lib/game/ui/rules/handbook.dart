@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:googleapis/books/v1.dart';
 import 'package:overlay_tutorial/overlay_tutorial.dart';
-import 'package:page_turn/page_turn.dart';
 
 class Handbook extends StatefulWidget {
   double contentHeight;
@@ -146,55 +145,67 @@ class _HandbookState extends State<Handbook> {
             child: MediaQuery.removePadding(
               context: context,
               removeTop: true,
-              child: ListView.builder(
-                itemCount: _inBookText.keys.length,
-                scrollDirection: Axis.horizontal,
+              child: Scrollbar(
+                thickness: 5,
+                isAlwaysShown: true,
+                interactive: true,
                 controller: _scrollController,
-                itemBuilder: (BuildContext context, int index) { 
-                  Widget wrap = Wrap();
-                  try { 
-                    wrap = Wrap(
-                      alignment: WrapAlignment.start,
-                      direction: Axis.vertical,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(top: 5, bottom: 5),
-                          width: widget.contentWidth * 0.38,
-                          child: Text(_inBookText.keys.elementAt(index), style: TextStyle(color: Colors.red, fontSize: 20), textAlign: TextAlign.center,)
+                trackVisibility: true,
+                radius: Radius.circular(10),
+                // scrollbarOrientation: ScrollbarOrientation.right,
+                child: Container(
+                  // padding: EdgeInsets.only(bottom: 10),
+                  child: ListView.builder(
+                    itemCount: _inBookText.keys.length,
+                    scrollDirection: Axis.horizontal,
+                    controller: _scrollController,
+                    itemBuilder: (BuildContext context, int index) { 
+                      Widget wrap = Wrap();
+                      try { 
+                        wrap = Wrap(
+                          alignment: WrapAlignment.start,
+                          direction: Axis.vertical,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(top: 5, bottom: 5),
+                              width: widget.contentWidth * 0.38,
+                              child: Text(_inBookText.keys.elementAt(index), style: TextStyle(color: Colors.red, fontSize: 20), textAlign: TextAlign.center,)
+                            ),
+                            for (var i in _inBookText.values.elementAt(index))...[
+                              Container(
+                                width: widget.contentWidth * 0.38,
+                                child: (i.contains("Google Drive")) 
+                                ? OverlayTutorialHole(
+                                  enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[6] : false,
+                                  overlayTutorialEntry: (widget.isTutorialEnabled) ? widget.tutorialOverlaysEntries[6] : OverlayTutorialRectEntry(),
+                                  child: Text(i, style: TextStyle(color: Colors.black, fontSize: 15),)
+                                )
+                                : Text(i, style: TextStyle(color: Colors.black, fontSize: 15),)
+                              )
+                            ],
+                          ],
+                        );
+                      } catch (e) {}
+              
+                      if(index == _inBookText.keys.length) {
+                        if (widget.isTutorialEnabled) {
+                          _scrollController.animateTo(widget.contentWidth * 0.8 * 2, duration: Duration(milliseconds: 0), curve: Curves.ease);
+                        }
+                      }
+                      return Container(
+                        padding: EdgeInsets.only(left: 10, right: 10,),
+                        decoration: BoxDecoration(
+                          border: Border.all(width: 5, color: Colors.grey),
+                          color: Colors.white,
                         ),
-                        for (var i in _inBookText.values.elementAt(index))...[
-                          Container(
-                            width: widget.contentWidth * 0.38,
-                            child: (i.contains("Google Drive")) 
-                            ? OverlayTutorialHole(
-                              enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[6] : false,
-                              overlayTutorialEntry: (widget.isTutorialEnabled) ? widget.tutorialOverlaysEntries[6] : OverlayTutorialRectEntry(),
-                              child: Text(i, style: TextStyle(color: Colors.black, fontSize: 15),)
-                            )
-                            : Text(i, style: TextStyle(color: Colors.black, fontSize: 15),)
-                          )
-                        ],
-                      ],
-                    );
-                  } catch (e) {}
-
-                  if(index == _inBookText.keys.length) {
-                    if (widget.isTutorialEnabled) {
-                      _scrollController.animateTo(widget.contentWidth * 0.8 * 2, duration: Duration(milliseconds: 0), curve: Curves.ease);
+                        height: widget.contentHeight * 0.95,
+                        // width: widget.contentWidth * 0.8,
+                        alignment: Alignment.topCenter,
+                        child: wrap,
+                      );
                     }
-                  }
-                  return Container(
-                    padding: EdgeInsets.only(left: 10, right: 10),
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 5, color: Colors.grey),
-                      color: Colors.white,
-                    ),
-                    height: widget.contentHeight * 0.95,
-                    // width: widget.contentWidth * 0.8,
-                    alignment: Alignment.topCenter,
-                    child: wrap,
-                  );
-                }
+                  ),
+                ),
               ),
             ),
           )

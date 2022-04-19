@@ -10,6 +10,9 @@ class Progress {
   double? rating;
   int? totalSuccess;
   int? totalFailed;
+  int? lifeTotalSuccess;
+  int? lifeTotalFailed;
+  double? lifeTotalScore;
   List<GameEmail>? emails;
   List<Item>? requests;
   Progress? restore;
@@ -22,6 +25,9 @@ class Progress {
     this.rating,
     this.totalFailed,
     this.totalSuccess,
+    this.lifeTotalFailed,
+    this.lifeTotalScore,
+    this.lifeTotalSuccess,
     this.emails,
     this.requests,
     this.restore,
@@ -29,35 +35,37 @@ class Progress {
   }){
     tutorial ??= {
       "FirstPlay": true,
-      "Authentication": true,
+      "Authorization": true,
       "Data": true,
     };
   }
 
   static Progress createDefault() {
+    int num = 0;;
+
     return Progress(
-      level: 0,
-      day: 0,
+      level: num,
+      day: num,
       totalScore: 0,
       totalFailed: 0,
       totalSuccess: 0,
       rating: 0,
-      emails: List.from(emailDatabase["level0"] ?? []),
-      requests: List.from(requestsOnBoard["level0"] ?? []),
+      emails: List.from(emailDatabase["level" + num.toString()] ?? []),
+      requests: List.from(requestsOnBoard["level"  + num.toString()] ?? []),
       tutorial: {
         "FirstPlay": true,
-        "Authentication": true,
+        "Authorization": true,
         "Data": true,
       },
       restore: Progress(
-        level: 0,
-        day: 0,
+        level: num,
+        day: num,
         totalScore: 0,
         rating: 0,
         totalFailed: 0,
         totalSuccess: 0,
-        emails: List.from(emailDatabase["level0"] ?? []),
-        requests: List.from(requestsOnBoard["level0"] ?? []),
+        emails: List.from(emailDatabase["level" + num.toString()] ?? []),
+        requests: List.from(requestsOnBoard["level" + num.toString()] ?? []),
       )
     );
   }

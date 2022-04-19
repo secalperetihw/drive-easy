@@ -24,6 +24,7 @@ class requestContents extends StatefulWidget {
   List<bool> isTutorialOn;
   List<OverlayTutorialRectEntry> tutorialOverlaysEntries;
   ValueChanged<Map> tutorialCallback;
+  ValueChanged<Widget> annoncementCallback;
 
   requestContents({
     required this.game,
@@ -39,6 +40,7 @@ class requestContents extends StatefulWidget {
     required this.isTutorialOn,
     required this.tutorialOverlaysEntries,
     required this.tutorialCallback,
+    required this.annoncementCallback,
     this.page,
     Key? key,
   }) : super(key: key);
@@ -93,13 +95,13 @@ class _requestContentsState extends State<requestContents> {
                           child: RichText(text: TextSpan(children: [
                             TextSpan(text: "{\n", style: TextStyle(color: Colors.white),),
                             TextSpan(text: "  \"Req-id\": ", style: TextStyle(color: Colors.white),),
-                            TextSpan(text: "\"${Item.convert(widget.item.reqId)}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["reqId"]!)) ? Colors.red : Colors.blue),),
+                            TextSpan(text: "\"${Item.convert(widget.item.reqId)}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getInitField!["reqId"]!)) ? Colors.red : Colors.blue),),
                             TextSpan(text: "  \"Req-type\": ", style: TextStyle(color: Colors.white),),
-                            TextSpan(text: "\"${Item.convert(widget.item.reqType)}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["reqType"]!)) ? Colors.red : Colors.blue),),
+                            TextSpan(text: "\"${Item.convert(widget.item.reqType)}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getInitField!["reqType"]!)) ? Colors.red : ((widget.item.finish ?? false) && (!(widget.item.getInitField!["matchAandT"]!)) ? Colors.red : Colors.blue),)),
                             TextSpan(text: "  \"File-type\": ", style: TextStyle(color: Colors.white),),
-                            TextSpan(text: "\"${Item.convert(widget.item.fileType)}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["fileType"]!)) ? Colors.red : Colors.blue),),
+                            TextSpan(text: "\"${Item.convert(widget.item.fileType)}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getInitField!["fileType"]!)) ? Colors.red : Colors.blue),),
                             TextSpan(text: "  \"Source\": ", style: TextStyle(color: Colors.white),),
-                            TextSpan(text: "\"${Item.convert(widget.item.source)}\"", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["source"]!)) ? Colors.red : Colors.blue),),
+                            TextSpan(text: "\"${Item.convert(widget.item.source)}\"", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getInitField!["source"]!)) ? Colors.red : Colors.blue),),
                             
                           ])),
                         ),
@@ -110,7 +112,7 @@ class _requestContentsState extends State<requestContents> {
                             overlayTutorialEntry: widget.tutorialOverlaysEntries[3],
                             child: RichText(text: TextSpan(children: [
                               TextSpan(text: "  \"Destination\": ", style: TextStyle(color: Colors.white),),
-                              TextSpan(text: "\"${Item.convert(widget.item.destination)}\"", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["destination"]!)) ? Colors.red : Colors.blue),),
+                              TextSpan(text: "\"${Item.convert(widget.item.destination)}\"", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getInitField!["destination"]!)) ? Colors.red : Colors.blue),),
                             ])),
                           ),
                         ),
@@ -118,11 +120,26 @@ class _requestContentsState extends State<requestContents> {
                           width: widget.contentWidth * 0.3,
                           child: RichText(text: TextSpan(children: [
                             TextSpan(text: "  \"Encryption\": ", style: TextStyle(color: Colors.white),),
-                            TextSpan(text: "\"${Item.convert(widget.item.encryption)}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["encryption"]!)) ? Colors.red : Colors.blue),),
-                            TextSpan(text: "  \"Action\": ", style: TextStyle(color: Colors.white),),
-                            TextSpan(text: "\"${(widget.item.action == null) ? "undefined" : Item.convert(widget.item.action)}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["action"]!)) ? Colors.red : Colors.blue),),
+                            TextSpan(text: "\"${Item.convert(widget.item.encryption)}\"", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getInitField!["encryption"]!)) ? Colors.red : Colors.blue),),
+                            
+                          ]))
+                        ),
+                        Container(
+                          width: widget.contentWidth * 0.3,
+                          child: OverlayTutorialHole(
+                            enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[15] : false,
+                            overlayTutorialEntry: widget.tutorialOverlaysEntries[16],
+                            child: RichText(text: TextSpan(children: [
+                              TextSpan(text: "  \"Action\": ", style: TextStyle(color: Colors.white),),
+                              TextSpan(text: "\"${(widget.item.action == null) ? "undefined" : Item.convert(widget.item.action)}\"", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getInitField!["action"]!)) ? Colors.red : ((widget.item.finish ?? false) && (!(widget.item.getInitField!["matchAandT"]!)) ? Colors.red : Colors.blue),),),
+                            ])),
+                          ),
+                        ),
+                        Container(
+                          width: widget.contentWidth * 0.3,
+                          child: RichText(text: TextSpan(children: [
                             TextSpan(text: "  \"Session-create-time\": ", style: TextStyle(color: Colors.white),),
-                            TextSpan(text: "\"${Jiffy(widget.item.sessionTime as DateTime).format("MM-dd hh:mm")}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getFields!["sessionTime"]!)) ? Colors.red : Colors.blue),),
+                            TextSpan(text: "\"${Jiffy(widget.item.sessionTime as DateTime).format("MM-dd hh:mm")}\"\n", style: TextStyle(color: ((widget.item.finish ?? false) && !(widget.item.getInitField!["sessionTime"]!)) ? Colors.red : Colors.blue),),
                             TextSpan(text: "}", style: TextStyle(color: Colors.white),),
                           ])),
                         ),],),
@@ -148,29 +165,38 @@ class _requestContentsState extends State<requestContents> {
                     child: Wrap(
                       alignment: WrapAlignment.center,
                       children: [
-                        requestPageButton(
-                          width: widget.contentWidth * 0.25,
-                          height: widget.contentHeight * 0.2,
-                          color: (widget.progress.level! >= 1) ? null : Colors.grey.shade700,
-                          onPressed: (value){
-                            if(widget.item.finish ?? false) return;
-                            if(widget.progress.level! >= 1) {
-                              setState(() {
-                                widget.page = 1;
-                                pageController!.animateToPage(1, duration: Duration(milliseconds: 500), curve: Curves.ease);
-                              });
-                            }
-                          },
-                          text: "Authorize",
+                        OverlayTutorialHole(
+                          enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[14] : false,
+                          overlayTutorialEntry: widget.tutorialOverlaysEntries[14],
+                          child: requestPageButton(
+                            width: widget.contentWidth * 0.25,
+                            height: widget.contentHeight * 0.2,
+                            color: (widget.progress.level! >= 2) ? null : Colors.grey.shade700,
+                            onPressed: (value){
+                              if(widget.item.finish ?? false) return;
+                              if(widget.progress.level! >= 2) {
+                                setState(() {
+                                  widget.page = 1;
+                                  pageController!.animateToPage(1, duration: Duration(milliseconds: 500), curve: Curves.ease);
+                                  if (widget.isTutorialEnabled && widget.isTutorialOn[14]) {
+                                    widget.isTutorialOn[14] = false;
+                                    widget.isTutorialOn[15] = true;
+                                    widget.tutorialCallback({"isTutorialOn": widget.isTutorialOn});
+                                  }
+                                });
+                              }
+                            },
+                            text: "Authorize",
+                          ),
                         ),
                         requestPageButton(
                           width: widget.contentWidth * 0.25,
                           height: widget.contentHeight * 0.2,
-                          color: (widget.progress.level! >= 2) ? null : Colors.grey.shade700,
+                          color: (widget.progress.level! >= 4) ? null : Colors.grey.shade700,
                           onPressed: (value){
                             // if(widget.item.finish ?? false) return;
                             // pageController!.jumpToPage(1);
-                            if(widget.progress.level! >= 2) {
+                            if(widget.progress.level! >= 4) {
                               if (widget.dataCallback != null){
                                 widget.dataCallback(true);
                               }
@@ -243,6 +269,19 @@ class _requestContentsState extends State<requestContents> {
                       icon: Icon(Icons.arrow_back, color: Colors.white,),
                     ),
                     requestAuth(
+                      isTutorialEnabled: widget.isTutorialEnabled,
+                      isTutorialOn: widget.isTutorialOn,
+                      tutorialOverlaysEntries: widget.tutorialOverlaysEntries,
+                      tutorialCallback: (value) {
+                        if (widget.isTutorialEnabled) {
+                          widget.tutorialCallback(value);
+                        }
+                      },
+                      annoncementCallback: (value) {
+                        setState(() {
+                          widget.annoncementCallback(value);
+                        });
+                      },
                       backButton: (){
                         // widget.page = 0;
                         pageController!.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.ease);

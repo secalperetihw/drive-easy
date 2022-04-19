@@ -54,72 +54,76 @@ class _EmailPageState extends State<EmailPage> {
               height: MediaQuery.of(context).size.height * 0.78,
               width: MediaQuery.of(context).size.width * 0.3,
               child: MediaQuery.removePadding(context: context, removeTop: true, 
-              child: ListView.builder(itemCount: widget.progress.emails?.length, itemBuilder: (ctx, index)  {
-                int realIndex = (widget.progress.emails?.length ?? 1) - index - 1;
-                return Container(
-                  child: Column(
-                    children: [
-                      GestureDetector(
-                        onLongPress: () async {
-                        },
-                        onTap: (){
-                          setState(() {
-                            widget.displayEmail = widget.progress.emails?[realIndex];
-                            widget.progress.emails?[realIndex].read = true;
-                            _scrollController.jumpTo(0);
-                            chosenEmail = realIndex;
-                            content = [];
-                            content.addAll(widget.displayEmail?.content?.split("\n") ?? []);
-                            for (int i=0; i<content.length; i++) {
-                              content[i] += "\n";
-                            }
-
-                            bool check = true;
-                            for (GameEmail email in widget.progress.emails!) {
-                              if (!(email.read ?? true)) {
-                                check = false;
+              child: Scrollbar(
+                thickness: 5,
+                isAlwaysShown: true,
+                interactive: true,
+                child: ListView.builder(itemCount: widget.progress.emails?.length, itemBuilder: (ctx, index)  {
+                  int realIndex = (widget.progress.emails?.length ?? 1) - index - 1;
+                  return Container(
+                    padding: EdgeInsets.only(right: 10),
+                    child: Column(
+                      children: [
+                        GestureDetector(
+                          onTap: (){
+                            setState(() {
+                              widget.displayEmail = widget.progress.emails?[realIndex];
+                              widget.progress.emails?[realIndex].read = true;
+                              _scrollController.jumpTo(0);
+                              chosenEmail = realIndex;
+                              content = [];
+                              content.addAll(widget.displayEmail?.content?.split("\n") ?? []);
+                              for (int i=0; i<content.length; i++) {
+                                content[i] += "\n";
                               }
-                            }
-                            widget.allRead(check);
-                          });
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.3,
-                          child: Wrap(
-                            alignment: WrapAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.3,
-                                child: Wrap(alignment: WrapAlignment.spaceBetween, children: [
-                                  Container(
-                                    width: MediaQuery.of(context).size.width * 0.25,
-                                    child: Text(widget.progress.emails![realIndex].title ?? "", style: TextStyle(color: (widget.progress.emails![realIndex].read ?? false) ? Colors.grey : Colors.white, fontWeight: FontWeight.bold)),
-                                  ),
-                                  Container(
-                                    child: RichText(textAlign: TextAlign.end, text: TextSpan(style: TextStyle(color: Colors.grey), children: [
-                                    TextSpan(text: "${widget.progress.emails![realIndex].time?.day.toString()}/${widget.progress.emails![realIndex].time?.month.toString()}", style: TextStyle())
-                                  ])),
-                                  ),
-                                ]),
-                              ),
-                              
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.3,
-                                child: Text("from: ${widget.progress.emails![realIndex].from}", style: TextStyle(overflow: TextOverflow.ellipsis, color: (widget.progress.emails![realIndex].read ?? false) ? Colors.grey : Colors.white)),
-                              ),
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.3,
-                                child: Text("${widget.progress.emails![realIndex].content!.split("\n")[0]}", style: TextStyle(overflow: TextOverflow.ellipsis, color: Colors.grey)),
-                              ),
-                            ],
+              
+                              bool check = true;
+                              for (GameEmail email in widget.progress.emails!) {
+                                if (!(email.read ?? true)) {
+                                  check = false;
+                                }
+                              }
+                              widget.allRead(check);
+                            });
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.3,
+                            child: Wrap(
+                              alignment: WrapAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width * 0.3,
+                                  child: Wrap(alignment: WrapAlignment.spaceBetween, children: [
+                                    Container(
+                                      width: MediaQuery.of(context).size.width * 0.25,
+                                      child: Text(widget.progress.emails![realIndex].title ?? "", style: TextStyle(color: (widget.progress.emails![realIndex].read ?? false) ? Colors.grey : Colors.white, fontWeight: FontWeight.bold)),
+                                    ),
+                                    Container(
+                                      child: RichText(textAlign: TextAlign.end, text: TextSpan(style: TextStyle(color: Colors.grey), children: [
+                                      TextSpan(text: "${widget.progress.emails![realIndex].time?.day.toString()}/${widget.progress.emails![realIndex].time?.month.toString()}", style: TextStyle())
+                                    ])),
+                                    ),
+                                  ]),
+                                ),
+                                
+                                Container(
+                                  width: MediaQuery.of(context).size.width * 0.3,
+                                  child: Text("from: ${widget.progress.emails![realIndex].from}", style: TextStyle(overflow: TextOverflow.ellipsis, color: (widget.progress.emails![realIndex].read ?? false) ? Colors.grey : Colors.white)),
+                                ),
+                                Container(
+                                  width: MediaQuery.of(context).size.width * 0.3,
+                                  child: Text("${widget.progress.emails![realIndex].content!.split("\n")[0]}", style: TextStyle(overflow: TextOverflow.ellipsis, color: Colors.grey)),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      Divider(color:  (chosenEmail == realIndex) ? Colors.blue : Colors.white,),
-                    ],
-                  ),
-                );
-              })),
+                        Divider(color:  (chosenEmail == realIndex) ? Colors.blue : Colors.white,),
+                      ],
+                    ),
+                  );
+                }),
+              )),
             ),
             Container(
               height: MediaQuery.of(context).size.height * 0.78,

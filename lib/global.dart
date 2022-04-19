@@ -48,7 +48,7 @@ enum PickFileType{
 }
 
 enum RequestType{
-  uplaod,
+  upload,
   download,
   transfer,
 }

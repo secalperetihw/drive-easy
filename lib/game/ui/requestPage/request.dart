@@ -18,6 +18,7 @@ class RequestMainPage extends StatefulWidget {
   Map<String, dynamic>? info;
   ValueChanged<Item> itemCallback;
   int tutorialOffset;
+  bool tutorial;
   // ValueChanged<Map> tutorialCallback;
   // ValueChanged<Duration> timeCallback;
 
@@ -27,6 +28,7 @@ class RequestMainPage extends StatefulWidget {
     required this.progress,
     required this.itemCallback,
     required this.tutorialOffset,
+    required this.tutorial,
     // required this.tutorialCallback,
     this.info,
     Key? key 
@@ -48,6 +50,7 @@ class _RequestMainPageState extends State<RequestMainPage> {
   bool _isTutorialEnabled = true;
   List<bool> _isTutorialOn = [];
   List<OverlayTutorialRectEntry> tutorialOverlaysEntries = [];
+  Widget announcement = Container();
 
   @override
   void initState() {
@@ -56,7 +59,8 @@ class _RequestMainPageState extends State<RequestMainPage> {
     pageController = PageController(initialPage: 0);
 
     _isTutorialOn = [
-      false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+      false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+      false, false, false
     ];
 
     if (widget.tutorialOffset == 0) {
@@ -66,8 +70,18 @@ class _RequestMainPageState extends State<RequestMainPage> {
     } else if (widget.tutorialOffset == 999) {
       _isTutorialOn[11] = true;
     }
-    
-    _isTutorialEnabled = widget.progress.tutorial!["FirstPlay"]!;
+    if (widget.progress.tutorial!["Authorization"]! && widget.progress.level == 2) {
+      
+      _isTutorialEnabled = widget.progress.tutorial!["Authorization"]!;
+      _isTutorialOn[14] = true;
+      _isTutorialOn[0] = false;
+      print("here0");
+    } else if (widget.progress.tutorial!["FirstPlay"]! && widget.progress.level == 0) {
+      _isTutorialEnabled = widget.progress.tutorial!["FirstPlay"]!;
+      print("here1");
+    } else {
+      _isTutorialEnabled = false;
+    }
 
     tutorialOverlaysEntries = [
       OverlayTutorialRectEntry(
@@ -102,8 +116,6 @@ class _RequestMainPageState extends State<RequestMainPage> {
                       setState(() {
                         _isTutorialOn[0] = false;
                         _isTutorialOn[1] = true;
-
-                        print(_isTutorialOn);
                       });
                     }
                   },
@@ -509,6 +521,123 @@ class _RequestMainPageState extends State<RequestMainPage> {
           ),
         ],
       ),
+      OverlayTutorialRectEntry(
+        padding: const EdgeInsets.all(8.0),
+        radius: const Radius.circular(16.0),
+        overlayTutorialHints: [
+          OverlayTutorialWidgetHint(
+            // position: (rect) => Offset(rect.center.dx - 50, rect.center.dy),
+            builder: (context, entryRect) {
+              return Positioned(
+                top: entryRect.rRect!.top - 24,
+                left: entryRect.rRect!.left,
+                child: DefaultTextStyle(
+                  style: TextStyle(color: Colors.white,),
+                  child: Text('Click here to authorize the source of package',)
+                ),
+              );
+            },
+          ),
+          OverlayTutorialWidgetHint(
+            // position: (rect) => Offset(rect.center.dx - 50, rect.center.dy),
+            builder: (context, entryRect) {
+              return Positioned(
+                top: (entryRect.rRect!.top + entryRect.rRect!.bottom) / 2,
+                left: entryRect.rRect!.left - 24,
+                child: Icon(Icons.arrow_right_alt, color: Colors.white),
+              );
+            },
+          ),
+        ],
+      ),
+      OverlayTutorialRectEntry(
+        padding: const EdgeInsets.all(8.0),
+        radius: const Radius.circular(16.0),
+        overlayTutorialHints: [
+          OverlayTutorialWidgetHint(
+            // position: (rect) => Offset(rect.center.dx - 50, rect.center.dy),
+            builder: (context, entryRect) {
+              return Positioned(
+                top: entryRect.rRect!.top - 24,
+                left: entryRect.rRect!.left,
+                child: DefaultTextStyle(
+                  style: TextStyle(color: Colors.white,),
+                  child: Text('Choose correct action correspond to request',)
+                ),
+              );
+            },
+          ),
+          OverlayTutorialWidgetHint(
+            // position: (rect) => Offset(rect.center.dx - 50, rect.center.dy),
+            builder: (context, entryRect) {
+              return Positioned(
+                top: (entryRect.rRect!.top + entryRect.rRect!.bottom) / 2,
+                left: entryRect.rRect!.left - 24,
+                child: Icon(Icons.arrow_right_alt, color: Colors.white),
+              );
+            },
+          ),
+        ],
+      ),
+      OverlayTutorialRectEntry(
+        padding: const EdgeInsets.all(8.0),
+        radius: const Radius.circular(16.0),
+        overlayTutorialHints: [
+          OverlayTutorialWidgetHint(
+            // position: (rect) => Offset(rect.center.dx - 50, rect.center.dy),
+            builder: (context, entryRect) {
+              return Positioned(
+                top: (entryRect.rRect!.top + entryRect.rRect!.bottom) / 2,
+                left: entryRect.rRect!.left - 24,
+                child: Icon(Icons.arrow_right_alt, color: Colors.white),
+              );
+            },
+          ),
+        ],
+      ),
+      OverlayTutorialRectEntry(
+        padding: const EdgeInsets.all(8.0),
+        radius: const Radius.circular(16.0),
+        overlayTutorialHints: [
+          OverlayTutorialWidgetHint(
+            // position: (rect) => Offset(rect.center.dx - 50, rect.center.dy),
+            builder: (context, entryRect) {
+              return Positioned(
+                top: entryRect.rRect!.top - 24,
+                left: entryRect.rRect!.left,
+                child: GestureDetector(
+                  onTap: () {
+                    if (_isTutorialEnabled && _isTutorialOn[16]) {
+                      setState(() {
+                        _isTutorialEnabled = false;
+                        _isTutorialOn[16] = false;
+                        widget.progress.tutorial!["Authorization"] = false;
+                      });
+                    }
+                  },
+                  child: DefaultTextStyle(
+                    style: TextStyle(color: Colors.white,),
+                    child: RichText(textAlign: TextAlign.center, text: TextSpan(children: const [
+                      TextSpan(text: 'You can consult the policy to check what to choose!\n',),
+                      TextSpan(text: 'Continue', style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline))
+                    ]))
+                  ),
+                ),
+              );
+            },
+          ),
+          OverlayTutorialWidgetHint(
+            // position: (rect) => Offset(rect.center.dx - 50, rect.center.dy),
+            builder: (context, entryRect) {
+              return Positioned(
+                top: (entryRect.rRect!.top + entryRect.rRect!.bottom) / 2,
+                left: entryRect.rRect!.left - 24,
+                child: Icon(Icons.arrow_right_alt, color: Colors.white),
+              );
+            },
+          ),
+        ],
+      ),
     ];
   }
 
@@ -615,7 +744,7 @@ class _RequestMainPageState extends State<RequestMainPage> {
                   Container(
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height * 0.2,
-                    child: Center(child: GameAnnoncement(item: widget.item,))
+                    child: Center(child: GameAnnoncement(item: widget.item, annoncement: announcement,))
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width,
@@ -638,6 +767,11 @@ class _RequestMainPageState extends State<RequestMainPage> {
                       controller: pageController,
                       children: [
                         requestContents(
+                          annoncementCallback: (value) {
+                            setState(() {
+                              announcement = value;
+                            });
+                          },
                           isTutorialEnabled: _isTutorialEnabled,
                           isTutorialOn: _isTutorialOn,
                           tutorialOverlaysEntries: tutorialOverlaysEntries,
@@ -650,7 +784,6 @@ class _RequestMainPageState extends State<RequestMainPage> {
                             if (value["isTutorialOn"] != null) {
                               setState(() {
                                 _isTutorialOn = value["isTutorialOn"];
-                                print(_isTutorialOn);
                               });
                             }
                             if (value["tutorialOverlaysEntries"] != null) {
@@ -658,12 +791,6 @@ class _RequestMainPageState extends State<RequestMainPage> {
                                 tutorialOverlaysEntries = value["tutorialOverlaysEntries"];
                               });
                             }
-                      
-                            // widget.tutorialCallback({
-                            //   "isTutorialEnabled": widget.isTutorialEnabled,
-                            //   "isTutorialOn": widget.isTutorialOn,
-                            //   "tutorialOverlaysEntries": widget.tutorialOverlaysEntries,
-                            // });
                           },
                           contentHeight: MediaQuery.of(context).size.height * 0.8,
                           contentWidth: MediaQuery.of(context).size.width,
@@ -716,7 +843,7 @@ class _RequestMainPageState extends State<RequestMainPage> {
                               });
                             }
                           },
-                          rulesVersion: "rules-level1",
+                          rulesVersion: "rules-version" + (widget.progress.level ?? 0).toString(),
                           contentHeight: MediaQuery.of(context).size.height * 0.8,
                           contentWidth: MediaQuery.of(context).size.width,
                           pageCallback: (value){
@@ -726,7 +853,7 @@ class _RequestMainPageState extends State<RequestMainPage> {
                           },
                           page: rulesPage,
                         ),
-                        if (widget.progress.level! >= 3)
+                        if (widget.progress.level! >= 4)
                           modifyPage(
                             contentHeight: MediaQuery.of(context).size.height * 0.8,
                             contentWidth: MediaQuery.of(context).size.width,
@@ -752,8 +879,6 @@ class _RequestMainPageState extends State<RequestMainPage> {
                         setState(() {
                           _isTutorialOn[4] = false;
                           _isTutorialOn[5] = true;
-
-                          print("here! $_isTutorialOn");
                         });
                       }
                       pageController.animateToPage(current, duration: Duration(milliseconds: 700), curve: Curves.ease);

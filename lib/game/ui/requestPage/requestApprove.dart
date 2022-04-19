@@ -74,6 +74,17 @@ class _requestApproveState extends State<requestApprove> {
                       width: widget.contentWidth * 0.3,
                       height: widget.contentHeight * 0.1,
                       onPressed: (value){
+                        if (!(widget.item.authorized ?? false) && widget.progress.level! >= 2) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: const Text("You haven't authorize this package yet!"),
+                            duration: const Duration(seconds: 3),
+                            action: SnackBarAction(
+                              label: 'OK',
+                              onPressed: () { },
+                            ),
+                          ));
+                          return;
+                        }
                         widget.item.finish = true;
                         widget.item = Check(widget.item);
                         widget.itemCallback(widget.item);
@@ -115,11 +126,11 @@ class _requestApproveState extends State<requestApprove> {
     );
   }
 
-  Item Check(item) {
+  Item Check(Item item) {
     Map<String, bool>? map = widget.item.getFields;
     Map<String, bool>? initMap = item.getInitField;
     bool check = true;
-    int score = 0;
+    int score = item.score!;
 
 
     map?.forEach((key, value) { 
@@ -131,7 +142,6 @@ class _requestApproveState extends State<requestApprove> {
 
     initMap?.forEach((key, value) {
       if (value == false) {
-        print(key);
         if (map?[key] != value) {
           score++;
         }

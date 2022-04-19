@@ -95,7 +95,7 @@ class _BlocksState extends State<Blocks> {
                   child: ElevatedButton(
                     child: Text('Browse'),
                     onPressed: (){
-                      (widget.browse ?? (){})();
+                      // (widget.browse ?? (){})();
                     },
                   ),
                 ),
@@ -103,7 +103,7 @@ class _BlocksState extends State<Blocks> {
                   padding: EdgeInsets.all(10),
                   child: ElevatedButton(
                     onPressed: ()  {
-                      (widget.signout ?? (){})();
+                      widget.signout!();
                     }, 
                     child: const Text("Signout")
                   ),

@@ -37,12 +37,14 @@ class requestDeny extends StatefulWidget {
 class _requestDenyState extends State<requestDeny> {
   List<String> reasons = [
     "Request ID incorrect",
-    "Unmatch type and action",
+    "Reqesut type not found",
     "Wrong file type",
     "Mysterious source",
     "Undefined destination",
     "Unsafe encryption",
+    "Wrong Action",
     "Session Expired",
+    "Unmatch type and action",
     "Others",
   ];
 
@@ -89,7 +91,7 @@ class _requestDenyState extends State<requestDeny> {
                     child: ListView.builder(
                       itemCount: reasons.length,
                       itemBuilder: ((context, index) {
-                        if (index == 3) {
+                        if (index == 4) {
                           return OverlayTutorialHole(
                             enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[9] : false,
                             overlayTutorialEntry: widget.tutorialOverlaysEntries[9],
@@ -145,6 +147,17 @@ class _requestDenyState extends State<requestDeny> {
                     width: widget.contentWidth * 0.3,
                     height: widget.contentHeight * 0.1,
                     onPressed: (value){
+                      if (!(widget.item.authorized ?? false) && widget.progress.level! >= 2) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: const Text("You haven't authorize this package yet!"),
+                          duration: const Duration(seconds: 3),
+                          action: SnackBarAction(
+                            label: 'OK',
+                            onPressed: () { },
+                          ),
+                        ));
+                        return;
+                      }
                       bool check = false;
                       _listOfBool.forEach((element) { 
                         if(element) check = true;
@@ -202,33 +215,35 @@ class _requestDenyState extends State<requestDeny> {
     Map<String, bool>? map = item.getFields;
     Map<String, bool>? initMap = item.getInitField;
     bool check = false;
-    int score = 0;
+    int score = item.score!;
 
-    map?.forEach((key, value) { 
+    initMap?.forEach((key, value) { 
       if (value == false) {
         check = true;
       }
     });
 
-    for (int i=0; i<map!.length; i++) {
-      if (i==7) {
-        map[map.keys.elementAt(i)] = !_listOfBool[1];
-      } else if (i==8) {
-        map[map.keys.elementAt(8)] = !_listOfBool[7];
-      } else {
-        map[map.keys.elementAt(i)] = !_listOfBool[i];
-      }
+    for (int i=0; i<map!.length; i++) {;
+      map[map.keys.elementAt(i)] = !_listOfBool[i];
     }
-    if (check) score++;
 
+    if (check) score++;
     initMap?.forEach((key, value) {
       if (value == false) {
-        if (map[key] != value) {
+        if (map[key] == value) {
           score++;
         }
       }
     });
-
+    initMap?.forEach((key, value) {
+      if (value == true && map[key] == false) {
+        item.wrongDenyReason = true;
+        score--;
+        if (score < 0) score = 0;
+      }
+    });
+    print(initMap);
+    print(map);
     item.success = check;
     item.score = score;
 

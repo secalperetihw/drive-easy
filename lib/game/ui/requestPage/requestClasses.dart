@@ -65,7 +65,7 @@ class GameAnnoncement extends StatefulWidget {
   Item? item;
   String? score;
   DateTime? time;
-  String? annoncement;
+  Widget? annoncement;
 
   GameAnnoncement({ 
     this.game,
@@ -108,19 +108,7 @@ class _GameAnnoncementState extends State<GameAnnoncement> {
           Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height * 0.1,
-            child: RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: (widget.item?.authenticating ?? false) 
-                    ? widget.annoncement
-                    : "", 
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                ]
-              ),
-            ),
+            child: widget.annoncement,
           ),
         ],
       ),

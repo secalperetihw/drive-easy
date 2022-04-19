@@ -1,8 +1,10 @@
 import 'dart:math';
 
+import 'package:drive_easy/documents/Authorization_User_refuse.dart';
 import 'package:drive_easy/global.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:googleapis/cloudbuild/v1.dart';
 
 class Item{
   dynamic reqId;
@@ -17,14 +19,20 @@ class Item{
   dynamic sessionTime;
   Duration? timeNeeded;
   bool? malicious = false;
-  bool? authenticating = false;
-  bool? authenticated = false;
+  bool? authorizing = false;
+  bool? authorized = false;
+  bool? authFailed = false;
   bool? finish = false;
   bool? success;
   bool? checking = false;
+  bool? wrongDenyReason;
   int? score;
   int? totalScore;
   String? mainPoint;
+  int? authSituation;
+
+  Widget _authResult = Container();
+  Widget get getAuthResult => _authResult;
 
   // ignore: prefer_final_fields
   Map<String, bool> _isFieldCorrect = {
@@ -34,9 +42,10 @@ class Item{
     "source": true,
     "destination": true,
     "encryption": true,
-    "content": true,
     "action": true,
     "sessionTime": true,
+    "matchAandT": true,
+    "content": true,
   };
   Map<String, bool>? get getFields => _isFieldCorrect;
 
@@ -63,13 +72,16 @@ class Item{
     this.sessionTime,
     this.timeNeeded,
     this.malicious,
-    this.authenticating,
-    this.authenticated,
+    this.authorizing,
+    this.authorized,
+    this.authFailed,
     this.finish,
     this.success,
     this.score,
     this.totalScore,
     this.mainPoint,
+    this.authSituation,
+    this.wrongDenyReason,
   }){
     (reqId is int) ? null : UpdateField("reqId", false);
     (reqType is RequestType) ? null : UpdateField("reqType", false);
@@ -80,7 +92,116 @@ class Item{
     (action is ActionType) ? null : UpdateField("action", false);
     (sessionTime is DateTime) ? null : UpdateField("sessionTime", false);
 
+    if (reqType is RequestType && action is ActionType) {
+      if (reqType == RequestType.upload && action != ActionType.POST) UpdateField("matchAandT", false);
+      if (reqType == RequestType.download && action != ActionType.GET) UpdateField("matchAandT", false);
+      if (reqType == RequestType.transfer && action != ActionType.POST) UpdateField("matchAandT", false);
+    }
+    if (reqType is !RequestType && action is !ActionType) UpdateField("matchAandT", false);
+
+    if (encryption is Encryption && destination is Drives) {
+      if (encryption == Encryption.AES128 && destination != Drives.googleDrive) {
+        UpdateField("encryption", false);
+      }
+    }
+
     _copyOfField = Map.from(_isFieldCorrect);
+  }
+
+  void setResult (int? num, BuildContext ctx) {
+
+    switch (num) {
+      case null:
+        _authResult = Container();
+        break;
+      case 0:
+        _authResult = RichText(textAlign: TextAlign.center, text: TextSpan(children: const [
+          TextSpan(text: "Authorization: done",  style: TextStyle(color: Colors.blue),),
+        ]),);
+        break;
+      case 1:
+        PageController pageController = PageController(initialPage: 0);
+        int _page = 0;
+        _authResult = Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          RichText(textAlign: TextAlign.center, text: TextSpan(children: const [
+            TextSpan(text: "Authorization: User refuse", style: TextStyle(color: Colors.red),),
+          ]),),
+          Container(padding: EdgeInsets.only(left: 15), child: GestureDetector(
+            onTap: () async {
+              await showDialog<void>(
+                context: ctx,
+                barrierDismissible: false, 
+                builder: (BuildContext buildContext) { 
+                  return Dialog(
+                    child: Container(
+                      height: MediaQuery.of(ctx).size.height * 0.8,
+                      width: MediaQuery.of(ctx).size.width * 0.8,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15)
+                      ),
+                      child: PageView(
+                        controller: pageController,
+                        children: [
+                          Authorization_User_refuse(
+                            onpress: () {
+                              Navigator.pop(buildContext);
+                            },
+                            text: "Got it!",
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              );
+            },
+            child: Icon(Icons.help_center, color: Colors.red),
+          ),)
+        ],);
+        break;
+      case 2:
+        PageController pageController = PageController(initialPage: 0);
+        int _page = 0;
+        _authResult = Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          RichText(textAlign: TextAlign.center, text: TextSpan(children: const [
+            TextSpan(text: "Authorization: Request timeout", style: TextStyle(color: Colors.red),),
+          ]),),
+          Container(padding: EdgeInsets.only(left: 15), child: GestureDetector(
+            onTap: () async {
+              await showDialog<void>(
+                context: ctx,
+                barrierDismissible: false, 
+                builder: (BuildContext buildContext) { 
+                  return Dialog(
+                    child: Container(
+                      height: MediaQuery.of(ctx).size.height * 0.8,
+                      width: MediaQuery.of(ctx).size.width * 0.8,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15)
+                      ),
+                      child: PageView(
+                        controller: pageController,
+                        children: [
+                          Authorization_User_refuse(
+                            onpress: () {
+                              Navigator.pop(buildContext);
+                            },
+                            text: "Got it!",
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              );
+            },
+            child: Icon(Icons.help_center, color: Colors.red),
+          ),)
+        ],);
+        break;
+    }
   }
 
   static String _randomMaliciousDrive() {
@@ -200,7 +321,7 @@ class Item{
       }
     } else if (any is RequestType){
       switch(any){
-        case RequestType.uplaod:
+        case RequestType.upload:
           return "upload";
         case RequestType.download:
           return "download";
