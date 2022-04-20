@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:drive_easy/documents/Authorization_Request_timeout.dart';
 import 'package:drive_easy/documents/Authorization_User_refuse.dart';
 import 'package:drive_easy/global.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,11 +15,11 @@ class Item{
   dynamic source;
   dynamic destination;
   dynamic encryption;
-  List<String>? content;
+  String? content;
   dynamic action;
   dynamic sessionTime;
   Duration? timeNeeded;
-  bool? malicious = false;
+  bool? malicious;
   bool? authorizing = false;
   bool? authorized = false;
   bool? authFailed = false;
@@ -28,8 +29,15 @@ class Item{
   bool? wrongDenyReason;
   int? score;
   int? totalScore;
+  int? finalScore;
   String? mainPoint;
   int? authSituation;
+  String? key;
+
+  Map<int, bool>? maliciousPosition;
+  bool? encrypted = false;
+  bool? wrapped = false;
+  bool? wrappedAfterEncrpyt = false;
 
   Widget _authResult = Container();
   Widget get getAuthResult => _authResult;
@@ -82,6 +90,8 @@ class Item{
     this.mainPoint,
     this.authSituation,
     this.wrongDenyReason,
+    this.key,
+    this.maliciousPosition,
   }){
     (reqId is int) ? null : UpdateField("reqId", false);
     (reqType is RequestType) ? null : UpdateField("reqType", false);
@@ -106,6 +116,21 @@ class Item{
     }
 
     _copyOfField = Map.from(_isFieldCorrect);
+
+    if (content != null) {  
+      List<String> input = content!.split(" ");
+
+      for (int i=0; i< input.length; i++) {
+        if (input[i].contains("*")) {
+          if (maliciousPosition == null) {
+            maliciousPosition = {i: true};
+          } else {
+            maliciousPosition!.addAll({i: true});
+          }
+        }
+      }
+    }
+    
   }
 
   void setResult (int? num, BuildContext ctx) {
@@ -184,7 +209,8 @@ class Item{
                       child: PageView(
                         controller: pageController,
                         children: [
-                          Authorization_User_refuse(
+                          Authorization_Request_timeout(
+                            width: MediaQuery.of(ctx).size.width * 0.8,
                             onpress: () {
                               Navigator.pop(buildContext);
                             },
@@ -224,7 +250,8 @@ class Item{
     FileType fileType = FileType.values[ran];
     ran = Random().nextInt(1);
     bool malicious = (ran == 0) ? false : true;
-    List<String> content = dummyContent;
+
+    String content = "";
 
     Item item = Item(
       name: fileName,
@@ -237,6 +264,20 @@ class Item{
     ); 
 
     return item;
+  }
+
+  static String randomStringGenerator({required int length, String? pool}) {
+    Random _rnd = Random();
+    String _pool = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#^&_+ ";
+    String result = "";
+
+    // for (int i=0; i<numOfString; i++) {
+      for (int j=0; j<length; j++) {
+        result += (pool ?? _pool)[_rnd.nextInt((pool ?? _pool).length)];
+      }
+    // }
+
+    return result;
   }
 
   static Widget convertToImage(Drives drives){

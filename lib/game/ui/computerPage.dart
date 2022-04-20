@@ -2,6 +2,7 @@ import 'package:drive_easy/classes/game/endLevelNotifier.dart';
 import 'package:drive_easy/classes/game/warningEmail.dart';
 import 'package:drive_easy/documents/Authorization_Whats_important.dart';
 import 'package:drive_easy/documents/OAuth2.dart';
+import 'package:drive_easy/documents/Problem_with_OAuth2_and_SSO.dart';
 import 'package:drive_easy/documents/Relation_between_action_and_reqtype.dart';
 import 'package:drive_easy/documents/SSO.dart';
 import 'package:drive_easy/documents/What_is_Authoriaztion.dart';
@@ -63,10 +64,14 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
   List<bool> _isTutorialOn = [];
   List<OverlayTutorialRectEntry> tutorialOverlaysEntries = [];
   bool readyToNextLevel = false;
+  int _page = 0;
+  late PageController pageController;
 
   @override
   void initState() {
     super.initState();
+
+    pageController = PageController(initialPage: _page);
     
     widget.item ??= Item.generate();
     // widget.item?.reqId = 1;
@@ -344,7 +349,7 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
                 itemField: value.getInitField!, 
                 wrongTimes: wrongTimes,
                 time: timeNow,
-                
+                item: (gameProgress.level! >= 4) ? value : null
               )
             );
             emailIcon = Icons.mark_email_unread;
@@ -715,8 +720,19 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
   }
 
   Widget dialog({required int level, required BuildContext ctx, required BuildContext currentContext}) {
-    int _page = 0;
-    PageController pageController = PageController(initialPage: _page);
+    
+
+    pageController.addListener(() {
+      
+    });
+
+    Function onpress(int page) {
+      return () => setState(() {
+        _page = page;
+        if (_page < 0) _page = 0;
+        pageController.animateToPage(_page, duration: Duration(milliseconds: 500), curve: Curves.ease);
+      });
+    }
     
     Widget summary = ListView(children: [
       Container(
@@ -749,9 +765,24 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(15)
           ),
-          child: PageView(
-            controller: pageController,
-            children: widgets,
+          child: Stack(
+            children: [
+              PageView(
+                physics: NeverScrollableScrollPhysics(),
+                controller: pageController,
+                children: widgets,
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _page--;
+                    if (_page < 0) _page = 0;
+                    pageController.animateToPage(_page, duration: Duration(milliseconds: 500), curve: Curves.ease);
+                  });
+                }, 
+                icon: Icon(Icons.arrow_back)
+              ),
+            ],
           ),
         ),
       );
@@ -766,16 +797,12 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
         Padding(padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10), child: Divider(color: Colors.black38,)),
         Center(child: Wrap(children: [ElevatedButton(onPressed: () {
           Navigator.pop(ctx);
+          setState(() {
+            _page = 0;
+          });
         }, child: Text(text ?? "Next Level"))],),),
         
       ],);
-    }
-
-    Function onpress(int page) {
-      return () => setState(() {
-        _page = page;
-        pageController.animateToPage(_page, duration: Duration(milliseconds: 500), curve: Curves.ease);
-      });
     }
 
     switch (level) {
@@ -821,10 +848,20 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
 
           SSO(onpress: onpress(3)),
 
+          Problem_with_OAuth2_and_SSO(onpress: onpress(4)),
+
           nextLevel(children: [
             TextSpan(text: "Next chapter, we will explore on ",),
             TextSpan(text: "Data Encryption", style: TextStyle(color: Colors.red)),
             TextSpan(text: "\nWhich is about securing data transfer",),
+          ])
+        ]);
+      case 4:
+        return cover(children: [
+          
+          nextLevel(children: [
+            TextSpan(text: "Next chapter, we will explore on ",),
+            TextSpan(text: "Continue of Data Encryption", style: TextStyle(color: Colors.red)),
           ])
         ]);
     }

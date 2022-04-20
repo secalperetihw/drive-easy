@@ -51,6 +51,7 @@ class _RequestMainPageState extends State<RequestMainPage> {
   List<bool> _isTutorialOn = [];
   List<OverlayTutorialRectEntry> tutorialOverlaysEntries = [];
   Widget announcement = Container();
+  double dataScrollOffset = 0;
 
   @override
   void initState() {
@@ -681,7 +682,7 @@ class _RequestMainPageState extends State<RequestMainPage> {
                     
                       return AlertDialog(
                         title: Text("Exit"),
-                        content: Text("Are you sure to exit?"),
+                        content: Text("Are you sure to exit?\nSome of the progress will wipe out.", style: TextStyle(color: Colors.red),),
                         actions: [
                           TextButton(
                             onPressed:(){
@@ -857,7 +858,19 @@ class _RequestMainPageState extends State<RequestMainPage> {
                           modifyPage(
                             contentHeight: MediaQuery.of(context).size.height * 0.8,
                             contentWidth: MediaQuery.of(context).size.width,
-                            item: widget.item
+                            item: widget.item,
+                            progress: widget.progress,
+                            scrollOffset: dataScrollOffset,
+                            callback: (value) {
+                              setState(() {
+                                if (value["progress"] != null) widget.progress = value["progress"];
+                                if (value["scrollOffset"] != null) dataScrollOffset = value["scrollOffset"];
+                                if (value["item"] != null) {
+                                  widget.item = value["item"];
+                                  widget.itemCallback(widget.item);
+                                }
+                              });
+                            },
                           ),
                       ],
                     ),

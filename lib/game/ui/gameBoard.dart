@@ -130,7 +130,11 @@ class _GameBoardPageState extends State<GameBoardPage> {
                             if (e.finish ?? false) ...[
                               RichText(text: TextSpan(style: TextStyle(color: (e.finish ?? false) ? Colors.grey : Colors.white), children: [
                                 TextSpan(text: "Score: ", style: TextStyle(color: Colors.grey)),
-                                TextSpan(text: "${e.score}/${e.totalScore}"),
+                                TextSpan(text: "${
+                                  (e.finish ?? false) ? e.score : 0
+                                }/${
+                                  (e.finish ?? false) ? e.totalScore : 0
+                                }"),
                               ]),),
                             ],
                           ],

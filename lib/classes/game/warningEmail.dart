@@ -1,4 +1,5 @@
 import 'package:drive_easy/classes/game/email.dart';
+import 'package:drive_easy/classes/game/item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -26,6 +27,7 @@ class WarningEmail extends GameEmail {
     required Map<String, bool> itemField,
     required int wrongTimes, 
     required DateTime time,
+    Item? item,
   }) {
     String s = "";
     List<TextStyle?> tmp = [
@@ -43,9 +45,16 @@ class WarningEmail extends GameEmail {
         check = false;
       }
     });
-
-    if (check) {
-      s += "  - The package content has nothing suspicious.\n";
+    
+    if (item != null) {
+      item.maliciousPosition!.forEach((key, value) {
+        if (value == true) s += "  - The data has malicious code injected and not being handled.\n";
+      });
+      if (item.wrappedAfterEncrpyt ?? false) s += "  - Data wrapped with HTTP request after Encryption.\n";
+    } else {
+      if (check) {
+        s += "  - The package bacis info has nothing suspicious.\n";
+      }
     }
 
     for (int i=0; i<s.split("\n").length; i++) {

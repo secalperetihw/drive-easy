@@ -88,6 +88,7 @@ class _requestApproveState extends State<requestApprove> {
                         widget.item.finish = true;
                         widget.item = Check(widget.item);
                         widget.itemCallback(widget.item);
+                        widget.item.finalScore = widget.item.score;
                         if (widget.isTutorialEnabled && widget.isTutorialOn[2]) {
                           setState(() {
                             widget.isTutorialOn[2] = false;
@@ -147,6 +148,19 @@ class _requestApproveState extends State<requestApprove> {
         }
       }
     });
+
+    if (widget.progress.level! >= 4) {
+      if (item.wrapped == true) score++;
+      if (item.encrypted == true) score++;
+      if (item.wrappedAfterEncrpyt == true) {
+        check = false;
+        score--;
+      }
+
+      item.maliciousPosition!.forEach((key, value) {
+        if (value == true) check = false;
+      });
+    }
 
     item.success = check;
     item.score = score;

@@ -13,6 +13,7 @@ class Progress {
   int? lifeTotalSuccess;
   int? lifeTotalFailed;
   double? lifeTotalScore;
+  double? textOffset;
   List<GameEmail>? emails;
   List<Item>? requests;
   Progress? restore;
@@ -32,6 +33,7 @@ class Progress {
     this.requests,
     this.restore,
     this.tutorial,
+    this.textOffset,
   }){
     tutorial ??= {
       "FirstPlay": true,
@@ -41,7 +43,7 @@ class Progress {
   }
 
   static Progress createDefault() {
-    int num = 0;;
+    int num = 4;
 
     return Progress(
       level: num,

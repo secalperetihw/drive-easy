@@ -1,9 +1,7 @@
-import 'package:drive_easy/documents/ExternalLink.dart';
+import 'package:drive_easy/documents/What_is_POST_GET.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import 'What_is_POST_GET.dart';
 
 class Relation_between_action_and_reqtype extends StatelessWidget {
   Function onpress;
@@ -67,11 +65,13 @@ class Relation_between_action_and_reqtype extends StatelessWidget {
           TextSpan(text: "GET - Give read only permission for getting files\n"),
           TextSpan(text: "For security, all access should be highly avoided\n"),
         ])),),
-        Container(
-          padding: EdgeInsets.all(10),
-          alignment: Alignment.centerRight,
-          child: ExternalLink(context: context, url: "https://www.cisa.gov/uscert/bsi/articles/knowledge/principles/least-privilege")
-        ),
+        // Container(
+        //   padding: EdgeInsets.only(left: 50, right: 50),
+        //   child: Image.asset("assets/images/tutorial/Encryption_Decryption.png",),
+        // ),
+        Center(child: RichText(textAlign: TextAlign.start, text: TextSpan(style: TextStyle(color: Colors.black, height: 2), children: const [
+          TextSpan(text: "\n"),
+        ])),),
         Padding(padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10), child: Divider(color: Colors.black38,)),
         Center(child: Wrap(children: [ElevatedButton(onPressed: () {
           onpress();

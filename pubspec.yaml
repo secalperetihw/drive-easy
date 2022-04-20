@@ -55,6 +55,9 @@ dependencies:
   tutorial: ^1.0.9
   overlay_tutorial: ^2.2.2
   url_launcher: ^6.0.20
+  auto_size_text: ^3.0.0
+  html_editor_enhanced: ^2.4.0+1
+  encrypt: ^5.0.1
 
 dev_dependencies:
   flutter_test:

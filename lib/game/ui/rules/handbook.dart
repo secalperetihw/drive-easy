@@ -152,9 +152,7 @@ class _HandbookState extends State<Handbook> {
                 controller: _scrollController,
                 trackVisibility: true,
                 radius: Radius.circular(10),
-                // scrollbarOrientation: ScrollbarOrientation.right,
                 child: Container(
-                  // padding: EdgeInsets.only(bottom: 10),
                   child: ListView.builder(
                     itemCount: _inBookText.keys.length,
                     scrollDirection: Axis.horizontal,

@@ -25,14 +25,17 @@ class SSO extends StatelessWidget {
         Center(child: RichText(textAlign: TextAlign.center, text: TextSpan(style: TextStyle(color: Colors.black, height: 2), children: [
           TextSpan(text: "Single Sign On (SSO)\n", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, height: 2)),
         ])),),
+        Center(child: RichText(textAlign: TextAlign.start, text: TextSpan(style: TextStyle(color: Colors.black, height: 2), children: const [
+          TextSpan(text: "SSO means technology allows one sign-in to access multiple applications\n"),
+        ])),),
         Container(
           padding: EdgeInsets.only(left: 50, right: 50),
           child: Image.asset("assets/images/tutorial/SSO.jpg",),
         ),
         Center(child: RichText(textAlign: TextAlign.start, text: TextSpan(style: TextStyle(color: Colors.black, height: 2), children: const [
-          TextSpan(text: "\n"),
-          TextSpan(text: "\n"),
-          TextSpan(text: "\n"),
+          TextSpan(text: "For example, you can sign-in Apple ID once to use multiple software,\n"),
+          TextSpan(text: "iCloud, iTunes and App store etc.\n"),
+          TextSpan(text: "Within session time or Company specific period.\n"),
           TextSpan(text: "\n"),
         ])),),
         Padding(padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10), child: Divider(color: Colors.black38,)),
