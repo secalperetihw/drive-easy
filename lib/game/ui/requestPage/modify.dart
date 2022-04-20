@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:overlay_tutorial/overlay_tutorial.dart';
 
 class modifyPage extends StatefulWidget {
   modifyPage({ 
@@ -21,6 +22,9 @@ class modifyPage extends StatefulWidget {
     required this.contentWidth,
     required this.progress,
     required this.callback,
+    required this.isTutorialEnabled,
+    required this.isTutorialOn,
+    required this.tutorialOverlaysEntries,
   }) : super(key: key);
 
   final GameMain? game;
@@ -30,6 +34,9 @@ class modifyPage extends StatefulWidget {
   Progress progress;
   ValueChanged<Map<String, dynamic>> callback;
   double? scrollOffset;
+  bool isTutorialEnabled;
+  List<bool> isTutorialOn;
+  List<OverlayTutorialRectEntry> tutorialOverlaysEntries;
 
   @override
   _modifyPageState createState() => _modifyPageState();
@@ -54,15 +61,13 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
 
   bool update = false;
 
-  encrypt.Encrypter? encrypter;
-  encrypt.Encrypted? encrypted;
-  final iv = encrypt.IV.fromLength(16);
+  var key = GlobalKey();  
 
   @override
   void initState() {
     super.initState();
 
-    input = widget.item.content!.split(" ");
+    input = (widget.item.finish == true) ? widget.item.getOriginContent.split(" ") : widget.item.content!.split(" ");
     for (int i=0; i< input.length; i++) {
       onhover.add(false);
       ontap.add(false);
@@ -72,10 +77,15 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    // widget.callback({"scrollOffset": scrollController.offset});
-
     super.dispose();
+  }
+
+  void rebuildAllChildren(BuildContext context) {
+    void rebuild(Element el) {
+      el.markNeedsBuild();
+      el.visitChildren(rebuild);
+    }
+    (context as Element).visitChildren(rebuild);
   }
 
   @override
@@ -102,101 +112,107 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
             child: MediaQuery.removePadding(
               context: context,
               removeTop: true,
-              child: ListView(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                children: input.map((e) {
-                  double width = widget.contentWidth * textOffset;
-
-                  textPainter = CustomTextPainter(
-                    text: e
-                    ,
-                    maxWidth: width,
-                  );
-                  textPainter.paint(Canvas(ui.PictureRecorder()), size);
-                  Offset offset = textPainter.returnOffset();
-                  size = Size(offset.dx, offset.dy);
-
-                  String s = "";
-                  input[input.indexOf(e)].codeUnits.forEach((element) { 
-                    s += element.toRadixString(16).padLeft(2, "0") + " ";
-                  });
-                  String text2 = s;
-                  textPainter2 = CustomTextPainter(
-                    text: text2,
-                    maxWidth: width * 3,
-                  );
-                  textPainter2.paint(Canvas(ui.PictureRecorder()), size);
-                  Offset offset2 = textPainter.returnOffset();
-                  size2 = Size(offset2.dx, offset2.dy);
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(
-                        child: Text( intFixed(input.indexOf(e), 2).toString(), style: TextStyle(color: Colors.white),)
-                      ),
-
-                      Container(
-                        width: width * 3,
-                        color: (onhover[input.indexOf(e)] || ontap[input.indexOf(e)]) 
-                          ? Colors.grey 
-                          : Colors.transparent,
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              ontap.forEach((element) {ontap[ontap.indexOf(element)] = false;});
-
-                              ontap[input.indexOf(e)] = true;
-                            });
-                          },
-                          child: MouseRegion(
-                            onEnter: (details) => setState(() => onhover[input.indexOf(e)] = true),
-                            onExit: (details) => setState(() => onhover[input.indexOf(e)] = false),
-                            child: CustomPaint(
-                              size: size2,
-                              painter: textPainter2,
-                            )
+              child: OverlayTutorialHole(
+                enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[18] : false,
+                overlayTutorialEntry: widget.tutorialOverlaysEntries[19],
+                child: ListView(
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  children: input.map((e) {
+                    double width = widget.contentWidth * textOffset;
+                  
+                    textPainter = CustomTextPainter(
+                      text: e,
+                      tutorialStyle: (widget.isTutorialEnabled == true && widget.item.maliciousPosition![input.indexOf(e)] != null && widget.isTutorialOn[18]) ? true : false,
+                      maxWidth: width,
+                    );
+                    textPainter.paint(Canvas(ui.PictureRecorder()), size);
+                    Offset offset = textPainter.returnOffset();
+                    size = Size(offset.dx, offset.dy);
+                  
+                    String s = "";
+                    input[input.indexOf(e)].codeUnits.forEach((element) { 
+                      s += element.toRadixString(16).padLeft(2, "0") + " ";
+                    });
+                    String text2 = s;
+                    textPainter2 = CustomTextPainter(
+                      text: text2,
+                      maxWidth: width * 3,
+                    );
+                    textPainter2.paint(Canvas(ui.PictureRecorder()), size);
+                    Offset offset2 = textPainter.returnOffset();
+                    size2 = Size(offset2.dx, offset2.dy);
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          child: Text( intFixed(input.indexOf(e), 2).toString(), style: TextStyle(color: Colors.white),)
+                        ),
+                  
+                        Container(
+                          width: width * 3,
+                          color: (onhover[input.indexOf(e)] || ontap[input.indexOf(e)]) 
+                            ? Colors.grey 
+                            : Colors.transparent,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                ontap.forEach((element) {ontap[ontap.indexOf(element)] = false;});
+                  
+                                ontap[input.indexOf(e)] = true;
+                              });
+                            },
+                            child: MouseRegion(
+                              onEnter: (details) => setState(() => onhover[input.indexOf(e)] = true),
+                              onExit: (details) => setState(() => onhover[input.indexOf(e)] = false),
+                              child: CustomPaint(
+                                size: size2,
+                                painter: textPainter2,
+                              )
+                            ),
                           ),
                         ),
-                      ),
-
-                      Container(
-                        width: width,
-                        color: (onhover[input.indexOf(e)] || ontap[input.indexOf(e)]) 
-                          ? Colors.grey 
-                          : Colors.transparent,
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              ontap.forEach((element) {ontap[ontap.indexOf(element)] = false;});
-
-                              ontap[input.indexOf(e)] = true;
-                              text = e;
-                            });
-                          },
-                          child: MouseRegion(
-                            onEnter: (details) => setState(() => onhover[input.indexOf(e)] = true),
-                            onExit: (details) => setState(() => onhover[input.indexOf(e)] = false),
-                            child: CustomPaint(
-                              size: size,
-                              painter: textPainter,
-                            )
+                  
+                        Container(
+                          // key: (widget.isTutorialEnabled == true && widget.item.maliciousPosition![input.indexOf(e)] != null && widget.isTutorialOn[18]) ? key : null,
+                          width: width,
+                          color: (onhover[input.indexOf(e)] || ontap[input.indexOf(e)]) 
+                            ? Colors.grey 
+                            : (widget.item.finish == true && widget.item.maliciousPosition![input.indexOf(e)] != null) 
+                              ? Colors.red
+                              : Colors.transparent,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                ontap.forEach((element) {ontap[ontap.indexOf(element)] = false;});
+                  
+                                ontap[input.indexOf(e)] = true;
+                                text = e;
+                              });
+                            },
+                            child: MouseRegion(
+                              onEnter: (details) => setState(() => onhover[input.indexOf(e)] = true),
+                              onExit: (details) => setState(() => onhover[input.indexOf(e)] = false),
+                              child: CustomPaint(
+                                size: size,
+                                painter: textPainter,
+                              )
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                }).toList(),
+                      ],
+                    );
+                  }).toList(),
+                ),
               ),
             ),
           ),
           Container(
             width: widget.contentWidth * 0.15,
             height: widget.contentHeight * 0.8,
-            color: Colors.red,
             alignment: Alignment.center,
-            child: Column(
+            child: (widget.item.finish ?? false) ? Container() : Column(
               // alignment: WrapAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -217,10 +233,10 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
                         widget.item.encrypted = true;
                       });
                       final key = encrypt.Key.fromUtf8(widget.item.key!);
-                      encrypter = encrypt.Encrypter(encrypt.AES(key));
-                      encrypted = encrypter!.encrypt(widget.item.content!, iv:iv);
+                      widget.item.encrypter = encrypt.Encrypter(encrypt.AES(key));
+                      widget.item.encryptedContent = widget.item.encrypter!.encrypt(widget.item.content!, iv:widget.item.iv);
                       setState(() {
-                        widget.item.content = encrypted!.base64;
+                        widget.item.content = widget.item.encryptedContent!.base64;
                         widget.callback({"item": widget.item});
                         input = [widget.item.content!];
                       });
@@ -258,8 +274,8 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
                           }
                           
                         }
-                        widget.item.content = widget.item.content! + encrypter!.decrypt(encrypted!, iv:iv);
-
+                        widget.item.content = widget.item.content! + widget.item.encrypter!.decrypt(widget.item.encryptedContent!, iv:widget.item.iv);
+    
                         input = widget.item.content!.split(" ");
                         onhover = [];
                         ontap = [];
@@ -284,37 +300,25 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
                   },
                   text: "Decrypt",
                 ),
-                requestPageButton(
-                  width: widget.contentWidth * 0.15,
-                  height: widget.contentHeight * 0.08,
-                  onPressed: (value){
-                    if (widget.item.encrypted == true) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: const Text("You can't filter after encrypted."),
-                        duration: const Duration(seconds: 3),
-                        action: SnackBarAction(
-                          label: 'OK',
-                          onPressed: () { },
-                        ),
-                      ));
-                      return;
-                    }
-                    if (widget.item.wrapped == true) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: const Text("You should filter before wrap."),
-                        duration: const Duration(seconds: 3),
-                        action: SnackBarAction(
-                          label: 'OK',
-                          onPressed: () { },
-                        ),
-                      ));
-                      return;
-                    }
+                OverlayTutorialHole(
+                  enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[18] : false,
+                  overlayTutorialEntry: widget.tutorialOverlaysEntries[20],
+                  child: requestPageButton(
+                    width: widget.contentWidth * 0.15,
+                    height: widget.contentHeight * 0.08,
+                    onPressed: (value){
+                      if (widget.isTutorialEnabled && widget.isTutorialOn[18]) {
+                        setState(() {
+                          widget.isTutorialOn[18] = false;
+                          widget.isTutorialOn[19] = true;
+                          // widget.isTutorialEnabled = false;
+                          widget.callback({"isTutorialOn" : widget.isTutorialOn});
+                        });
+                      }
 
-                    setState(() {
-                      if (ontap.indexOf(true) == -1) {
+                      if (widget.item.encrypted == true) {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: const Text("You haven't chosen line yet."),
+                          content: const Text("You can't filter after encrypted."),
                           duration: const Duration(seconds: 3),
                           action: SnackBarAction(
                             label: 'OK',
@@ -323,48 +327,73 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
                         ));
                         return;
                       }
-                      String s = input[ontap.indexOf(true)];
-                      int index = ontap.indexOf(true) - ((widget.item.wrapped == true) ? 14 : 0);
-                      if (widget.item.maliciousPosition![index] ?? false) {
-                        s = s.replaceAll("function", "\"function\"");
-                        s = s.replaceAll("execute", "\"execute\"");
-                        s = s.replaceAll("(", "\\(");
-                        s = s.replaceAll(")", "\\)");
-                        s = s.replaceAll("{", "\\{");
-                        s = s.replaceAll("}", "\\}");
-                        s = s.replaceAll(":", "\\:");
-                        s = s.replaceAll(";", "\\;");
-
-                        widget.item.maliciousPosition![index] = false;
-                        if(input[ontap.indexOf(true)].contains("**")) widget.item.score = widget.item.score! + 1;
-                      } else {
-                        s = s.replaceAll("\"function\"", "function");
-                        s = s.replaceAll("\"execute\"", "execute");
-                        s = s.replaceAll("\\(", "(");
-                        s = s.replaceAll("\\)", ")");
-                        s = s.replaceAll("\\{", "{");
-                        s = s.replaceAll("\\}", "}");
-                        s = s.replaceAll("\\:", ":");
-                        s = s.replaceAll("\\;", ";");
-
-                        widget.item.maliciousPosition![index] = true;
-                        if(input[ontap.indexOf(true)].contains("**")) widget.item.score = widget.item.score! - 1;
+                      if (widget.item.wrapped == true) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: const Text("You should filter before wrap."),
+                          duration: const Duration(seconds: 3),
+                          action: SnackBarAction(
+                            label: 'OK',
+                            onPressed: () { },
+                          ),
+                        ));
+                        return;
                       }
-
-                      input[ontap.indexOf(true)] = s;
-
-                      widget.item.content = "";
-                      for (int i= 0; i<input.length; i++) {
-                        widget.item.content = widget.item.content! + input[i] + " ";
-                      }
-
-                      text = input[ontap.indexOf(true)];
-                      widget.callback({"item": widget.item});
-
-                      print(widget.item.score);
-                    });
-                  },
-                  text: "Filter",
+                    
+                      setState(() {
+                        if (ontap.indexOf(true) == -1) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: const Text("You haven't chosen line yet."),
+                            duration: const Duration(seconds: 3),
+                            action: SnackBarAction(
+                              label: 'OK',
+                              onPressed: () { },
+                            ),
+                          ));
+                          return;
+                        }
+                        String s = input[ontap.indexOf(true)];
+                        int index = ontap.indexOf(true) - ((widget.item.wrapped == true) ? 14 : 0);
+                        if (widget.item.maliciousPosition![index] ?? false) {
+                          s = s.replaceAll("function", "\"function\"");
+                          s = s.replaceAll("execute", "\"execute\"");
+                          s = s.replaceAll("(", "\\(");
+                          s = s.replaceAll(")", "\\)");
+                          s = s.replaceAll("{", "\\{");
+                          s = s.replaceAll("}", "\\}");
+                          s = s.replaceAll(":", "\\:");
+                          s = s.replaceAll(";", "\\;");
+                    
+                          widget.item.maliciousPosition![index] = false;
+                          if(input[ontap.indexOf(true)].contains("**")) widget.item.score = widget.item.score! + 1;
+                        } else {
+                          s = s.replaceAll("\"function\"", "function");
+                          s = s.replaceAll("\"execute\"", "execute");
+                          s = s.replaceAll("\\(", "(");
+                          s = s.replaceAll("\\)", ")");
+                          s = s.replaceAll("\\{", "{");
+                          s = s.replaceAll("\\}", "}");
+                          s = s.replaceAll("\\:", ":");
+                          s = s.replaceAll("\\;", ";");
+                    
+                          widget.item.maliciousPosition![index] = true;
+                          if(input[ontap.indexOf(true)].contains("**")) widget.item.score = widget.item.score! - 1;
+                        }
+                    
+                        input[ontap.indexOf(true)] = s;
+                    
+                        widget.item.content = "";
+                        for (int i= 0; i<input.length; i++) {
+                          widget.item.content = widget.item.content! + input[i] + " ";
+                        }
+                    
+                        text = input[ontap.indexOf(true)];
+                        widget.callback({"item": widget.item});
+                    
+                        print(widget.item.score);
+                      });
+                    },
+                    text: "Filter",
+                  ),
                 ),
                 requestPageButton(
                   width: widget.contentWidth * 0.15,
@@ -379,12 +408,12 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
                         input = widget.item.content!.split(" ");
                         onhover = [];
                         ontap = [];
-
+    
                         for (int i=0; i< input.length; i++) {
                           onhover.add(false);
                           ontap.add(false);
                         }
-
+    
                         widget.item.wrapped = false;
                         widget.callback({"item": widget.item});
                       });
@@ -419,12 +448,12 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
                       }
                     );
                     if(!exit) return;
-
+    
                     setState(() {
                       
                       String s = "";
-
-
+    
+    
                       s += "${Item.convert(widget.item.action)}\thttps://${widget.item.destination}/api/${Item.convert(widget.item.reqType)}/DriveEasy\tHTTPS "
                       + "Host:\tcom.forpersonaluse.drive_easy "
                       + "Token:\t" + Item.randomStringGenerator(length: 16, pool: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") + " "
@@ -440,18 +469,18 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
                       + "Cache-Control:\tno-cache "
                       + "Content:\t ";
                       s += widget.item.content!;
-
+    
                       setState(() {
                         widget.item.content = s;
                         input = widget.item.content!.split(" ");
                         onhover = [];
                         ontap = [];
-
+    
                         for (int i=0; i< input.length; i++) {
                           onhover.add(false);
                           ontap.add(false);
                         }
-
+    
                         if (widget.item.encrypted == true) widget.item.wrappedAfterEncrpyt = true;
                         widget.item.content = s + widget.item.content!;
                         widget.item.wrapped = true;
@@ -469,7 +498,7 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
                     onPressed: (value){
                       setState(() {
                         if (textOffset <= 0.17) textOffset += 0.01;
-
+    
                         widget.progress.textOffset = textOffset;
                         widget.callback({"progress": widget.progress});
                       });
@@ -482,7 +511,7 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
                     onPressed: (value){
                       setState(() {
                         if (textOffset >= 0.05) textOffset -= 0.01;
-
+    
                         widget.progress.textOffset = textOffset;
                         widget.callback({"progress": widget.progress});
                       });
@@ -522,6 +551,86 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
   bool get wantKeepAlive => true;
 }
 
+class on9 extends StatelessWidget {
+  on9({
+    Key? key,
+    required this.width,
+    required this.onhover,
+    required this.input,
+    required this.ontap,
+    required this.size,
+    required this.textPainter,
+    required this.item,
+    required this.e,
+    required this.isTutorialEnabled,
+    required this.isTutorialOn,
+    required this.tutorialOverlaysEntries,
+    required this.gestureDectorOnTap,
+    required this.onEnter,
+    required this.onExit,
+  }) : super(key: key);
+
+  final double width;
+  final List<bool> onhover;
+  final List<String> input;
+  final List<bool> ontap;
+  final ui.Size size;
+  final CustomTextPainter textPainter;
+  final Item item;
+  final String e;
+  final bool isTutorialEnabled;
+  final List<bool> isTutorialOn;
+  final tutorialOverlaysEntries;
+  final Function gestureDectorOnTap;
+  final Function onEnter;
+  final Function onExit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      color: (onhover[input.indexOf(e)] || ontap[input.indexOf(e)]) 
+        ? Colors.grey 
+        : (item.finish == true && item.maliciousPosition![input.indexOf(e)] != null) 
+          ? Colors.red
+          : Colors.transparent,
+      child: (isTutorialEnabled == true && item.maliciousPosition![input.indexOf(e)] != null && isTutorialOn[18]) 
+      ? OverlayTutorialHole(
+        
+        enabled: (isTutorialEnabled) ? isTutorialOn[18] : false,
+        overlayTutorialEntry: tutorialOverlaysEntries[19],
+        child: GestureDetector(
+          onTap: () {
+            gestureDectorOnTap();
+          },
+          child: MouseRegion(
+            onEnter: (details) => onEnter(),
+            onExit: (details) => onExit(),
+            child: CustomPaint(
+              size: size,
+              painter: textPainter,
+            )
+          ),
+        ),
+      )
+      
+      : GestureDetector(
+        onTap: () {
+          gestureDectorOnTap();
+        },
+        child: MouseRegion(
+          onEnter: (details) => onEnter(),
+          onExit: (details) => onExit(),
+          child: CustomPaint(
+            size: size,
+            painter: textPainter,
+          )
+        ),
+      ),
+    );
+  }
+}
+
 class CustomTextPainter extends CustomPainter { 
   String text;
   double maxWidth;
@@ -529,11 +638,13 @@ class CustomTextPainter extends CustomPainter {
   int? numberOfLines;
   Offset? offset;
   bool? chosen = false;
+  bool? tutorialStyle;
 
   CustomTextPainter({
     required this.text,
     required this.maxWidth,
     this.chosen,
+    this.tutorialStyle,
     // required this.lengthCallback,
   });
 
@@ -541,7 +652,7 @@ class CustomTextPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
 
     final textStyle = TextStyle(
-      color: Colors.white,
+      color: (tutorialStyle ?? false) ? Colors.red : Colors.white,
       fontSize: 12,
     );
 

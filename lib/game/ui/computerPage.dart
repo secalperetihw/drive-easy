@@ -1,9 +1,14 @@
 import 'package:drive_easy/classes/game/endLevelNotifier.dart';
 import 'package:drive_easy/classes/game/warningEmail.dart';
+import 'package:drive_easy/documents/Actual_Process.dart';
 import 'package:drive_easy/documents/Authorization_Whats_important.dart';
+import 'package:drive_easy/documents/Cloud_Computing.dart';
+import 'package:drive_easy/documents/Filtering.dart';
 import 'package:drive_easy/documents/OAuth2.dart';
 import 'package:drive_easy/documents/Problem_with_OAuth2_and_SSO.dart';
+import 'package:drive_easy/documents/REST_API.dart';
 import 'package:drive_easy/documents/Relation_between_action_and_reqtype.dart';
+import 'package:drive_easy/documents/SSL_TLS.dart';
 import 'package:drive_easy/documents/SSO.dart';
 import 'package:drive_easy/documents/What_is_Authoriaztion.dart';
 import 'package:drive_easy/documents/What_is_Encryption.dart';
@@ -276,7 +281,7 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
                         }
                       },
                       child: RichText(textAlign: TextAlign.center, text: TextSpan(children: const [
-                        TextSpan(text:  'Oops... uhhh.. don\'t mind about the score,\n you can do well if you get in to this.\nBye Bye...\n', style: TextStyle(color: Colors.white),),
+                        TextSpan(text:  'Oops... uhhh.. don\'t mind about the score,\n you can do well if you get in to this.\nBye Bye!!!\n', style: TextStyle(color: Colors.white),),
                     
                         TextSpan(text:  'bye', style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),),
                       ])),
@@ -387,6 +392,8 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
         }
       },
     );
+  
+    // beforeStart();
   }
 
   @override
@@ -402,6 +409,7 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight
     ]);
+    
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     return Scaffold(
       backgroundColor: Colors.black,
@@ -818,7 +826,7 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
           ),
           
           nextLevel(children: [
-
+            TextSpan(text: "Let's get started.",),
           ])
         ]);
       case 1:
@@ -858,13 +866,34 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
         ]);
       case 4:
         return cover(children: [
-          
+          Actual_Process(onpress: onpress(2)),
+
+          Filtering(onpress: onpress(3)),
+
+          SSL_TLS(onpress: onpress(4)),
+
           nextLevel(children: [
-            TextSpan(text: "Next chapter, we will explore on ",),
-            TextSpan(text: "Continue of Data Encryption", style: TextStyle(color: Colors.red)),
+            TextSpan(text: "Next chapter, after finish, we will talk about ",),
+            TextSpan(text: "Cloud Computing", style: TextStyle(color: Colors.red)),
+          ])
+        ]);
+      case 5:
+        return cover(children: [
+          REST_API(onpress: onpress(2)),
+
+          Cloud_Computing(onpress: onpress(3)),
+
+          nextLevel(children: [
+            TextSpan(text: "Currenly, This is the end of the game!\n",),
+            TextSpan(text: "Thank you for playing!",),
+          ])
+        ]);
+      default: 
+        return cover(children: [
+          nextLevel(children: [
+            
           ])
         ]);
     }
-    return Container();
   }
 }

@@ -189,21 +189,32 @@ class _requestContentsState extends State<requestContents> {
                             text: "Authorize",
                           ),
                         ),
-                        requestPageButton(
-                          width: widget.contentWidth * 0.25,
-                          height: widget.contentHeight * 0.2,
-                          color: (widget.progress.level! >= 4) ? null : Colors.grey.shade700,
-                          onPressed: (value){
-                            // if(widget.item.finish ?? false) return;
-                            // pageController!.jumpToPage(1);
-                            if(widget.progress.level! >= 4) {
-                              if (widget.dataCallback != null){
-                                widget.dataCallback(true);
+                        OverlayTutorialHole(
+                          enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[17] : false,
+                          overlayTutorialEntry: widget.tutorialOverlaysEntries[18],
+                          child: requestPageButton(
+                            width: widget.contentWidth * 0.25,
+                            height: widget.contentHeight * 0.2,
+                            color: (widget.progress.level! >= 4) ? null : Colors.grey.shade700,
+                            onPressed: (value){
+                              // if(widget.item.finish ?? false) return;
+                              // pageController!.jumpToPage(1);
+                              if(widget.progress.level! >= 4) {
+                                if (widget.dataCallback != null){
+                                  widget.dataCallback(true);
+                                }
                               }
-                            }
 
-                          },
-                          text: "Data",
+                              if (widget.isTutorialEnabled && widget.isTutorialOn[17]) {
+                                widget.isTutorialOn[17] = false;
+                                widget.isTutorialOn[18] = true;
+                                widget.tutorialCallback({"isTutorialOn": widget.isTutorialOn});
+                              }
+                        
+                            },
+                            
+                            text: "Data",
+                          ),
                         ),
                         OverlayTutorialHole(
                           enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[8] : false,

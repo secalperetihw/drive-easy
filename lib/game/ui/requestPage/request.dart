@@ -7,6 +7,7 @@ import 'package:drive_easy/game/ui/requestPage/requestContent.dart';
 import 'package:drive_easy/game/ui/rules/handbook.dart';
 import 'package:drive_easy/global.dart';
 import 'package:flame/flame.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:overlay_tutorial/overlay_tutorial.dart';
@@ -61,7 +62,7 @@ class _RequestMainPageState extends State<RequestMainPage> {
 
     _isTutorialOn = [
       false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-      false, false, false
+      false, false, false, false, false, false
     ];
 
     if (widget.tutorialOffset == 0) {
@@ -80,6 +81,11 @@ class _RequestMainPageState extends State<RequestMainPage> {
     } else if (widget.progress.tutorial!["FirstPlay"]! && widget.progress.level == 0) {
       _isTutorialEnabled = widget.progress.tutorial!["FirstPlay"]!;
       print("here1");
+    } else if (widget.progress.tutorial!["Data"]! && widget.progress.level == 4) {
+      _isTutorialEnabled = widget.progress.tutorial!["Data"]!;
+      _isTutorialOn[17] = true;
+      _isTutorialOn[0] = false;
+      print("here2");
     } else {
       _isTutorialEnabled = false;
     }
@@ -639,6 +645,86 @@ class _RequestMainPageState extends State<RequestMainPage> {
           ),
         ],
       ),
+      OverlayTutorialRectEntry(
+        padding: const EdgeInsets.all(8.0),
+        radius: const Radius.circular(16.0),
+        overlayTutorialHints: [
+          OverlayTutorialWidgetHint(
+            // position: (rect) => Offset(rect.center.dx - 50, rect.center.dy),
+            builder: (context, entryRect) {
+              return Positioned(
+                top: (entryRect.rRect!.top + entryRect.rRect!.bottom) / 2,
+                left: entryRect.rRect!.left - 24,
+                child: Icon(Icons.arrow_right_alt, color: Colors.white),
+              );
+            },
+          ),
+        ],
+      ),
+      OverlayTutorialRectEntry(
+        padding: const EdgeInsets.all(8.0),
+        radius: const Radius.circular(16.0),
+        overlayTutorialHints: [
+          OverlayTutorialWidgetHint(
+            // position: (rect) => Offset(rect.center.dx - 50, rect.center.dy),
+            builder: (context, entryRect) {
+              return Positioned(
+                top: entryRect.rRect!.top - 48,
+                left: (entryRect.rRect!.left + entryRect.rRect!.right) / 2,
+                child:  DefaultTextStyle(
+                  style: TextStyle(color: Colors.white,),
+                  child: Text('You can see a code has been injected to this package.\nClick the red text, then click fliter.',)
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      OverlayTutorialRectEntry(
+        padding: const EdgeInsets.all(8.0),
+        radius: const Radius.circular(16.0),
+        overlayTutorialHints: [
+          OverlayTutorialWidgetHint(
+            // position: (rect) => Offset(rect.center.dx - 50, rect.center.dy),
+            builder: (context, entryRect) {
+              return Positioned(
+                top: entryRect.rRect!.bottom,
+                left: (entryRect.rRect!.left + entryRect.rRect!.right) / 2,
+                child: Icon(Icons.arrow_upward, color: Colors.white),
+              );
+            },
+          ),
+        ],
+      ),
+      OverlayTutorialRectEntry(
+        padding: const EdgeInsets.all(8.0),
+        radius: const Radius.circular(16.0),
+        overlayTutorialHints: [
+          OverlayTutorialWidgetHint(
+            // position: (rect) => Offset(rect.center.dx - 50, rect.center.dy),
+            builder: (context, entryRect) {
+              return Center(
+                child: DefaultTextStyle(
+                  style: TextStyle(color: Colors.white,),
+                  child: RichText(textAlign: TextAlign.center, text: TextSpan(children: [
+                    TextSpan(text: 'Now you should consult the handbook to see what to do!\n\n',),
+                    TextSpan(
+                      text: "OK!", 
+                      style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+                      recognizer: TapGestureRecognizer()..onTap = () {
+                        setState(() {
+                          _isTutorialOn[19] = false;
+                          _isTutorialEnabled = false;
+                        });
+                      }
+                    )
+                  ]),)
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     ];
   }
 
@@ -742,6 +828,11 @@ class _RequestMainPageState extends State<RequestMainPage> {
                 // mainAxisAlignment: MainAxisAlignment.end,
                 alignment: WrapAlignment.end,
                 children: [
+                  OverlayTutorialHole(
+                    enabled: (_isTutorialEnabled) ? _isTutorialOn[19] : false,
+                    overlayTutorialEntry: tutorialOverlaysEntries[21],
+                    child: Container()
+                  ),
                   Container(
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height * 0.2,
@@ -856,6 +947,9 @@ class _RequestMainPageState extends State<RequestMainPage> {
                         ),
                         if (widget.progress.level! >= 4)
                           modifyPage(
+                            isTutorialEnabled: _isTutorialEnabled,
+                            isTutorialOn: _isTutorialOn,
+                            tutorialOverlaysEntries: tutorialOverlaysEntries,
                             contentHeight: MediaQuery.of(context).size.height * 0.8,
                             contentWidth: MediaQuery.of(context).size.width,
                             item: widget.item,
@@ -868,6 +962,21 @@ class _RequestMainPageState extends State<RequestMainPage> {
                                 if (value["item"] != null) {
                                   widget.item = value["item"];
                                   widget.itemCallback(widget.item);
+                                }
+                                if (value["isTutorialEnabled"] != null) {
+                                  setState(() {
+                                    _isTutorialEnabled = value["isTutorialEnabled"];
+                                  });
+                                }
+                                if (value["isTutorialOn"] != null) {
+                                  setState(() {
+                                    _isTutorialOn = value["isTutorialOn"];
+                                  });
+                                }
+                                if (value["tutorialOverlaysEntries"] != null) {
+                                  setState(() {
+                                    tutorialOverlaysEntries = value["tutorialOverlaysEntries"];
+                                  });
                                 }
                               });
                             },

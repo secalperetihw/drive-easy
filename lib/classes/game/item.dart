@@ -1,11 +1,11 @@
 import 'dart:math';
-
 import 'package:drive_easy/documents/Authorization_Request_timeout.dart';
 import 'package:drive_easy/documents/Authorization_User_refuse.dart';
 import 'package:drive_easy/global.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:googleapis/cloudbuild/v1.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
 
 class Item{
   dynamic reqId;
@@ -34,10 +34,16 @@ class Item{
   int? authSituation;
   String? key;
 
+  encrypt.Encrypter? encrypter;
+  encrypt.Encrypted? encryptedContent;
+  final iv = encrypt.IV.fromLength(16);
   Map<int, bool>? maliciousPosition;
   bool? encrypted = false;
   bool? wrapped = false;
   bool? wrappedAfterEncrpyt = false;
+  String? _originContent;
+
+  String get getOriginContent => _originContent ?? "";
 
   Widget _authResult = Container();
   Widget get getAuthResult => _authResult;
@@ -131,6 +137,7 @@ class Item{
       }
     }
     
+    _originContent = content;
   }
 
   void setResult (int? num, BuildContext ctx) {
