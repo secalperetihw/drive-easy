@@ -1,3 +1,4 @@
+import 'package:drive_easy/game/ui/startGame.dart';
 import 'package:drive_easy/login.dart';
 import 'package:drive_easy/ui/pages/mainpage.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -42,9 +43,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: LoginPage(),
-      backgroundColor: Colors.grey,
-    );
+    // return Scaffold(
+      return StartGamePage();
+    // );
   }
 }

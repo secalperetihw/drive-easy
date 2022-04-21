@@ -14,8 +14,10 @@ import 'package:drive_easy/documents/What_is_Authoriaztion.dart';
 import 'package:drive_easy/documents/What_is_Encryption.dart';
 import 'package:drive_easy/documents/What_is_POST_GET.dart';
 import 'package:drive_easy/documents/Why_correct_info_important.dart';
+import 'package:drive_easy/game/ui/documentsPage.dart';
 import 'package:drive_easy/game/ui/gameBoard.dart';
 import 'package:drive_easy/game/ui/gameEmailPage.dart';
+import 'package:drive_easy/game/ui/previousBoard.dart';
 import 'package:drive_easy/game/ui/report.dart';
 import 'package:drive_easy/classes/game/email.dart';
 import 'package:drive_easy/classes/game/item.dart';
@@ -26,6 +28,7 @@ import 'package:drive_easy/global.dart';
 import 'package:drive_easy/static/emails.dart';
 import 'package:drive_easy/static/requestsOnBoard.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:tutorial/tutorial.dart';
@@ -71,12 +74,15 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
   bool readyToNextLevel = false;
   int _page = 0;
   late PageController pageController;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
 
     pageController = PageController(initialPage: _page);
+
+    _scrollController = ScrollController();
     
     widget.item ??= Item.generate();
     // widget.item?.reqId = 1;
@@ -281,7 +287,7 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
                         }
                       },
                       child: RichText(textAlign: TextAlign.center, text: TextSpan(children: const [
-                        TextSpan(text:  'Oops... uhhh.. don\'t mind about the score,\n you can do well if you get in to this.\nBye Bye!!!\n', style: TextStyle(color: Colors.white),),
+                        TextSpan(text:  'Oops... uhhh.. don\'t mind about the score,\n you can do well if you get in to this.\nBy.. Bye!!!\n', style: TextStyle(color: Colors.white),),
                     
                         TextSpan(text:  'bye', style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),),
                       ])),
@@ -296,6 +302,7 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
     ];
 
     gameBoard = GameBoardPage(
+      timeNow: timeNow,
       isTutorialEnabled: _isTutorialEnabled,
       isTutorialOn: _isTutorialOn,
       tutorialOverlaysEntries: tutorialOverlaysEntries,
@@ -328,16 +335,19 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
         }
       },
       itemCallback: (value) {
-        setState(() {
-          // widget.item = value;
-          
-        });
+        if (value.finish == true) {
+          setState(() {
+            gameProgress.lifeScore = (gameProgress.lifeScore ?? 0) + value.score!;
+            gameProgress.lifeTotalScore = (gameProgress.lifeTotalScore ?? 0) + value.totalScore!;
+          });
+        }
+        
 
         if (value.wrongDenyReason ?? false) {
           setState(() {
             gameProgress.emails!.add(
               WarningEmail.wrongReason(
-                id: value.reqId,
+                id: (value.reqId is String) ? int.parse(value.reqId) : value.reqId,
                 time: timeNow,
               )
             );
@@ -350,7 +360,7 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
             wrongTimes++;
             gameProgress.emails!.add(
               WarningEmail.defaultStyle(
-                id: value.reqId,
+                id: (value.reqId is String) ? int.parse(value.reqId) : value.reqId,
                 itemField: value.getInitField!, 
                 wrongTimes: wrongTimes,
                 time: timeNow,
@@ -390,6 +400,11 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
             readyToNextLevel = true;
           });
         }
+      },
+      progressCallback: (value) {
+        setState(() {
+          gameProgress = value;
+        });
       },
     );
   
@@ -436,174 +451,28 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
               Container(
                 height: MediaQuery.of(context).size.height * 0.15,
                 width: MediaQuery.of(context).size.width * 0.9,
-                child: Wrap(
+                child: 
+                Wrap(
                   alignment: WrapAlignment.spaceBetween,
                   children: [
-                    Wrap(
-                      alignment: WrapAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () async {
-                            bool exit = false;
-                            await showDialog<void>(
-                              context: context,
-                              barrierDismissible: false, // user must tap button!
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text("Exit"),
-                                  content: Text("Are you sure to exit?"),
-                                  actions: [
-                                    TextButton(
-                                      onPressed:(){
-                                        exit = true;
-                                        Navigator.pop(context);
-                                      }, 
-                                      child: Text("Yes")
-                                    ),
-                                    TextButton(
-                                      onPressed:(){
-                                        exit = false;
-                                        Navigator.pop(context);
-                                      }, 
-                                      child: Text("No")
-                                    )
-                                  ],
-                                );
-                              }
-                            );
-                            if(exit){
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                            decoration: BoxDecoration(
-                              border: (_selectedIndex == 0) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
-                            ),
-                            child: Icon(Icons.home, color: Colors.white,),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: (){
-                            setState(() {
-                              _selectedIndex = 1;
-                              display = EmailPage(
-                                displayEmail: displayEmail, 
-                                progress: gameProgress,
-                                allRead: (value) {
-                                  if (value) {
-                                    setState(() {
-                                      emailIcon = Icons.mark_email_read;
-                                    });
-                                  } else {
-                                    setState(() {
-                                      emailIcon = Icons.mark_email_unread;
-                                    });
-                                  }
-                                },
-                              );
-                            });
-                          },
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                            decoration: BoxDecoration(
-                              border: (_selectedIndex == 1) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
-                            ),
-                            child: Icon(emailIcon, color: (emailIcon == Icons.mark_email_read) ? Colors.white : Colors.red,),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: (){
-                            setState(() {
-                              _selectedIndex = 2;
-                              display = gameBoard;
-                              if(_isTutorialEnabled && _isTutorialOn[1]) {
-                                _isTutorialOn[1] = false;
-                                _isTutorialOn[2] = true;
-                              }
-                            });
-                          },
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                            decoration: BoxDecoration(
-                              border: (_selectedIndex == 2) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
-                            ),
-                            child: OverlayTutorialHole(
-                              enabled: (_isTutorialEnabled) ? _isTutorialOn[1] : false,
-                              overlayTutorialEntry: tutorialOverlaysEntries[1],
-                              child: Icon(Icons.task, color: Colors.white,)
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: (){
-                            setState(() {
-                              _selectedIndex = 3;
-                              display = Handbook(
-                                isTutorialEnabled: false,
-                                isTutorialOn: const [],
-                                tutorialOverlaysEntries: const [],
-                                tutorialCallback: (value) {
-                                  
-                                },
-                                rulesVersion: "rules-version" + (gameProgress.level ?? 0).toString(),
-                                contentHeight: MediaQuery.of(context).size.height * 0.75,
-                                contentWidth: MediaQuery.of(context).size.width * 0.9,
-                                pageCallback: (value) { 
-          
-                                },
-                              );
-                            });
-                          },
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                            decoration: BoxDecoration(
-                              border: (_selectedIndex == 3) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
-                            ),
-                            child: Icon(Icons.bookmark, color: Colors.white,),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: (){
-                            setState(() {
-                              _selectedIndex = 4;
-                              display = GameReport(progress: gameProgress,);
-                            });
-                          },
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                            decoration: BoxDecoration(
-                              border: (_selectedIndex == 4) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
-                            ),
-                            child: Icon(Icons.info, color: Colors.white,),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: (){
-                            setState(() {
-                              _selectedIndex = 5;
-                              display = Container();
-                            });
-                          },
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                            decoration: BoxDecoration(
-                              border: (_selectedIndex == 5) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
-                            ),
-                            child: Icon(Icons.settings, color: Colors.white,),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () async {
-                            if (readyToNextLevel) {
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.1,
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      child: ListView(
+                        // alignment: WrapAlignment.start,
+                        controller: _scrollController,
+                        scrollDirection: Axis.horizontal,
+                        children: [
+                          GestureDetector(
+                            onTap: () async {
                               bool exit = false;
                               await showDialog<void>(
                                 context: context,
                                 barrierDismissible: false, // user must tap button!
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: Text("Next day"),
-                                    content: Text("Are you sure to end the day?"),
+                                    title: Text("Exit"),
+                                    content: Text("Are you sure to exit?"),
                                     actions: [
                                       TextButton(
                                         onPressed:(){
@@ -624,49 +493,232 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
                                 }
                               );
                               if(exit){
-                                endPopup();
-                                setState(() {
-                                  // gameProgress.chapter = ((gameProgress.level ?? 0) + 1) ~/ 2;
-                                  readyToNextLevel = false;
-                                });
+                                Navigator.pop(context);
                               }
-                            }
-                            else {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: const Text("You didn't finish all tasks today."),
-                                duration: const Duration(seconds: 3),
-                                action: SnackBarAction(
-                                  label: 'OK',
-                                  onPressed: () { },
-                                ),
-                              ));
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                            decoration: BoxDecoration(
-                              border: null,
+                            },
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              decoration: BoxDecoration(
+                                border: (_selectedIndex == 0) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
+                              ),
+                              child: Icon(Icons.home, color: Colors.white,),
                             ),
-                            child: Icon(Icons.skip_next, color: (readyToNextLevel) ? Colors.green : Colors.white,),
                           ),
-                        ),
-                        GestureDetector(
-                          onTap: (){
-                            setState(() {
-                              _isTutorialEnabled = false;
-                              gameProgress.tutorial!["FirstPlay"] = false;
-                            });
-                          },
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                            decoration: BoxDecoration(
-                              border: null,
+                          GestureDetector(
+                            onTap: (){
+                              setState(() {
+                                _selectedIndex = 1;
+                                display = EmailPage(
+                                  displayEmail: displayEmail, 
+                                  progress: gameProgress,
+                                  allRead: (value) {
+                                    if (value) {
+                                      setState(() {
+                                        emailIcon = Icons.mark_email_read;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        emailIcon = Icons.mark_email_unread;
+                                      });
+                                    }
+                                  },
+                                );
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              decoration: BoxDecoration(
+                                border: (_selectedIndex == 1) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
+                              ),
+                              child: Icon(emailIcon, color: (emailIcon == Icons.mark_email_read) ? Colors.white : Colors.red,),
                             ),
-                            child: Icon(Icons.restore, color: Colors.white,),
                           ),
-                        ),
-                      ],
+                          GestureDetector(
+                            onTap: (){
+                              setState(() {
+                                _selectedIndex = 2;
+                                display = gameBoard;
+                                if(_isTutorialEnabled && _isTutorialOn[1]) {
+                                  _isTutorialOn[1] = false;
+                                  _isTutorialOn[2] = true;
+                                }
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              decoration: BoxDecoration(
+                                border: (_selectedIndex == 2) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
+                              ),
+                              child: OverlayTutorialHole(
+                                enabled: (_isTutorialEnabled) ? _isTutorialOn[1] : false,
+                                overlayTutorialEntry: tutorialOverlaysEntries[1],
+                                child: Icon(Icons.task, color: Colors.white,)
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              setState(() {
+                                _selectedIndex = 3;
+                                display = Handbook(
+                                  isTutorialEnabled: false,
+                                  isTutorialOn: const [],
+                                  tutorialOverlaysEntries: const [],
+                                  tutorialCallback: (value) {
+                                    
+                                  },
+                                  rulesVersion: "rules-version" + (gameProgress.level ?? 0).toString(),
+                                  contentHeight: MediaQuery.of(context).size.height * 0.75,
+                                  contentWidth: MediaQuery.of(context).size.width * 0.9,
+                                  pageCallback: (value) { 
+                              
+                                  },
+                                );
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              decoration: BoxDecoration(
+                                border: (_selectedIndex == 3) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
+                              ),
+                              child: Icon(Icons.bookmark, color: Colors.white,),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              setState(() {
+                                _selectedIndex = 4;
+                                display = GameReport(progress: gameProgress,);
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              decoration: BoxDecoration(
+                                border: (_selectedIndex == 4) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
+                              ),
+                              child: Icon(Icons.info, color: Colors.white,),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              setState(() {
+                                _selectedIndex = 5;
+                                display = Container();
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              decoration: BoxDecoration(
+                                border: (_selectedIndex == 5) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
+                              ),
+                              child: Icon(Icons.settings, color: Colors.white,),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              if (readyToNextLevel) {
+                                bool exit = false;
+                                await showDialog<void>(
+                                  context: context,
+                                  barrierDismissible: false, // user must tap button!
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text("Next day"),
+                                      content: Text("Are you sure to end the day?"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed:(){
+                                            exit = true;
+                                            Navigator.pop(context);
+                                          }, 
+                                          child: Text("Yes")
+                                        ),
+                                        TextButton(
+                                          onPressed:(){
+                                            exit = false;
+                                            Navigator.pop(context);
+                                          }, 
+                                          child: Text("No")
+                                        )
+                                      ],
+                                    );
+                                  }
+                                );
+                                if(exit){
+                                  endPopup();
+                                  setState(() {
+                                    // gameProgress.chapter = ((gameProgress.level ?? 0) + 1) ~/ 2;
+                                    readyToNextLevel = false;
+                                    emailIcon = Icons.mark_email_unread;
+                                  });
+                                }
+                              }
+                              else {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: const Text("You didn't finish all tasks today."),
+                                  duration: const Duration(seconds: 3),
+                                  action: SnackBarAction(
+                                    label: 'OK',
+                                    onPressed: () { },
+                                  ),
+                                ));
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              decoration: BoxDecoration(
+                                border: null,
+                              ),
+                              child: Icon(Icons.skip_next, color: (readyToNextLevel) ? Colors.green : Colors.white,),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              setState(() {
+                                _isTutorialEnabled = false;
+                                gameProgress.tutorial!["FirstPlay"] = false;
+
+                                _selectedIndex = 6;
+                                display = Center(
+                                  child: PreviousBoard(
+                                    progress: gameProgress,
+                                    contentHeight: MediaQuery.of(context).size.height * 0.8,
+                                    contentWidth: MediaQuery.of(context).size.width * 0.9,
+                                    timeNow: timeNow,
+                                  ),
+                                );
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              decoration: BoxDecoration(
+                                border: (_selectedIndex == 6) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
+                              ),
+                              child: Icon(Icons.restore, color: Colors.white,),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              setState(() {
+                                _selectedIndex = 7;
+                                display = DocumentsPage(
+                                  contentHeight: MediaQuery.of(context).size.height * 0.8,
+                                  contentWidth: MediaQuery.of(context).size.width * 0.8,
+                                );
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              decoration: BoxDecoration(
+                                border: (_selectedIndex == 7) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
+                              ),
+                              child: Icon(Icons.file_open, color: Colors.white,),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                    // Icon(Icons.arrow_right, color: Colors.white,),
                     RichText(
                       textAlign: TextAlign.center,
                       text: TextSpan(style: TextStyle(color: Colors.white), children: [
@@ -707,6 +759,7 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
           gameProgress.emails!.add(email);
         }
       } catch(e){ print(e); }
+      gameProgress.previousRequests.addAll(gameProgress.requests ?? []);
       gameProgress.requests = List.from(requestsOnBoard[s]!);
       //requestsOnBoard[s];
       timeNow = DateTime(timeNow.year, timeNow.month, timeNow.day + 1, 09, 00, 00);
@@ -747,9 +800,10 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
         width: MediaQuery.of(currentContext).size.width * 0.7,
         child: Center(child: RichText(textAlign: TextAlign.center, text: TextSpan(style: TextStyle(color: Colors.black, height: 2), children: [
           TextSpan(text: "Day ${gameProgress.day.toString()} end\n", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, height: 2)),
-          TextSpan(text: "Overall Rating: ${gameProgress.rating.toString()}\n"),
+          TextSpan(text: "Overall Rating: ${gameProgress.calRating()}\n"),
           TextSpan(text: "tasks finished: ${gameProgress.successCount().toString()}/${gameProgress.requests?.length.toString()}\n"),
-          TextSpan(text: "Score: ${gameProgress.scoreCount().toString()}/${gameProgress.totalScore}\n"),
+          TextSpan(text: "Score this level: ${gameProgress.scoreCount().toString()}/${gameProgress.totalScoreCount().toString()}\n"),
+          TextSpan(text: "Total score: ${gameProgress.lifeScore.toString()}/${gameProgress.lifeTotalScore.toString()}\n"),
         ])),)
       ),
       Padding(padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10), child: Divider(color: Colors.black38,)),

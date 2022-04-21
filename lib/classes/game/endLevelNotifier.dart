@@ -22,8 +22,6 @@ class EndLevel extends ChangeNotifier {
     if (totalCount != null) this.totalCount = totalCount;
     if (time != null) this.time = time;
 
-    print("finishCount: ${finishCount}, totalCount: ${this.totalCount}, time: ${time}");
-
     if (this.finishCount == this.totalCount || this.time.hour == 17) {
       return true;
     }

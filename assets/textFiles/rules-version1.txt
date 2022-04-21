@@ -7,7 +7,7 @@ Employees Handbook
 //
 Jobs duty
 - 09:00 - 17:00 everyday
-- finish given number of tasks
+- identify correct package
 //
 Our Policies
 Basic policies:
@@ -44,3 +44,9 @@ Basic policies:
 Special policies: 
  - Only Google Drive are allow to use both AES128 and AES256
  - Other must use AES256
+//
+Score counting
+Approve correct package: 2
+Deny incorrect package: 1
+Each match deny reason: 1
+Each unmatch deny reason: -1

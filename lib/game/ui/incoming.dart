@@ -52,7 +52,6 @@ class _incomingState extends State<incoming> {
                           item: e, 
                           onGet: (){
                             setState(() {
-                              print("clicked");
                               widget.game.incoming.remove(e);
                               widget.game.itemHolding.add(e);
                             });

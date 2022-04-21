@@ -157,7 +157,7 @@ class _requestApproveState extends State<requestApprove> {
         score--;
       }
 
-      item.maliciousPosition!.forEach((key, value) {
+      (item.maliciousPosition ?? {}).forEach((key, value) {
         if (value == true) check = false;
       });
     }

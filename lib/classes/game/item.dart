@@ -121,6 +121,8 @@ class Item{
       }
     }
 
+    if (action is !ActionType) authorized = true;
+
     _copyOfField = Map.from(_isFieldCorrect);
 
     if (content != null) {  
@@ -160,7 +162,7 @@ class Item{
           ]),),
           Container(padding: EdgeInsets.only(left: 15), child: GestureDetector(
             onTap: () async {
-              await showDialog<void>(
+              showDialog<void>(
                 context: ctx,
                 barrierDismissible: false, 
                 builder: (BuildContext buildContext) { 

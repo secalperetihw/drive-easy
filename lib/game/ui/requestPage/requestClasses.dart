@@ -98,7 +98,7 @@ class _GameAnnoncementState extends State<GameAnnoncement> {
               textAlign: TextAlign.center,
               text: TextSpan(
                 children: [
-                  TextSpan(text: "Score: ${widget.score ?? ""}", style: TextStyle(color: Colors.white),),
+                  // TextSpan(text: "Score: ${widget.score ?? ""}", style: TextStyle(color: Colors.white),),
                   TextSpan(text: "  Time: ", style: TextStyle(color: Colors.white),),
                   TextSpan(text: Jiffy(widget.time ?? DateTime.now()).format("MM-dd h:mm"), style: TextStyle(color: Colors.blue),),
                 ]

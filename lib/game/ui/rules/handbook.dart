@@ -33,7 +33,7 @@ class Handbook extends StatefulWidget {
   State<Handbook> createState() => _HandbookState();
 }
 
-class _HandbookState extends State<Handbook> {
+class _HandbookState extends State<Handbook> with AutomaticKeepAliveClientMixin<Handbook>{
   late ScrollController _scrollController;
   int _page = 0;
   int _MAX_PAGE = 0;
@@ -82,16 +82,58 @@ class _HandbookState extends State<Handbook> {
         _page = 0;
         _scrollController.animateTo(0, duration: Duration(milliseconds: 500), curve: Curves.ease);
       },
-      "End": (){ 
-        _page = _MAX_PAGE;
-        _scrollController.animateTo(widget.contentWidth * 0.8 * _page, duration: Duration(milliseconds: 500), curve: Curves.ease);
-      },
       "Policies": (){
         _page = 1;
         _scrollController.animateTo(widget.contentWidth * 0.8 * _page, duration: Duration(milliseconds: 500), curve: Curves.ease);
-      }
+      },
     };
+
+    _page = 2;
+    if (widget.rulesVersion.contains("2") || widget.rulesVersion.contains("3")) {
+      _page = 3;
+      _buttons.addAll({
+        "Auth": () {
+          _page = 2;
+          _scrollController.animateTo(widget.contentWidth * 0.8 * _page, duration: Duration(milliseconds: 500), curve: Curves.ease);
+        }
+      });
+    }
+
+    if (widget.rulesVersion.contains("4") || widget.rulesVersion.contains("5")) {
+      _page = 4;
+      _buttons.addAll({
+        "Auth": () {
+          _page = 2;
+          _scrollController.animateTo(widget.contentWidth * 0.8 * _page, duration: Duration(milliseconds: 500), curve: Curves.ease);
+        },
+        "Data": () {
+          _page = 3;
+          _scrollController.animateTo(widget.contentWidth * 0.8 * _page, duration: Duration(milliseconds: 500), curve: Curves.ease);
+        }
+      });
+    }
     
+    int num = 0;
+    if (_page == 2) num = 3;
+    if (_page == 3) num = 4;
+    if (_page == 4) num = 5;
+    
+    _buttons.addAll({
+      "Special": () {
+        _page = num;
+        _scrollController.animateTo(widget.contentWidth * 0.8 * _page, duration: Duration(milliseconds: 500), curve: Curves.ease);
+      },
+      "Score": (){
+        _page = num+1;
+        _scrollController.animateTo(widget.contentWidth * 0.8 * _page, duration: Duration(milliseconds: 500), curve: Curves.ease);
+      }
+      // "End": (){ 
+      //   _page = _MAX_PAGE;
+      //   _scrollController.animateTo(widget.contentWidth * 0.8 * _page, duration: Duration(milliseconds: 500), curve: Curves.ease);
+      // },
+    });
+
+    _page = 0;
   }
 
   @override
@@ -211,4 +253,8 @@ class _HandbookState extends State<Handbook> {
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

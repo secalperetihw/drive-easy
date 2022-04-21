@@ -43,9 +43,9 @@ class _GameReportState extends State<GameReport> {
                   ),
                   Center(
                     child: Container(width: MediaQuery.of(context).size.width * 0.15, child: RichText(
-                      textAlign: TextAlign.start, text: TextSpan(style: TextStyle(height: 1.5, color: Colors.white), children: [
+                      textAlign: TextAlign.start, text: TextSpan(style: TextStyle(height: 1.5, color: Colors.white), children: const [
                         TextSpan(text: "Name: player\n"),
-                        TextSpan(text: "ID: 11111\n"),
+                        TextSpan(text: "ID: 123456\n"),
                         TextSpan(text: "Employed since: 01/04/2022\n"),
                       ]),
                     ),),
@@ -59,13 +59,15 @@ class _GameReportState extends State<GameReport> {
                     child: RichText(textAlign: TextAlign.center, text: TextSpan(style: TextStyle(color: Colors.white, height: 2), children: [
                       TextSpan(text: "Record\n", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
                       TextSpan(text: "Rating: "),
-                      TextSpan(text: (widget.progress.rating == 0) ? "A\n" : widget.progress.rating.toString(), style: TextStyle(fontSize: 30, color: Colors.red)),
+                      TextSpan(text: widget.progress.calRating() + "\n", style: TextStyle(fontSize: 30, color: Colors.red)),
+                      TextSpan(text: "Score: "),
+                      TextSpan(text: "${widget.progress.lifeScore.toString()}/${widget.progress.lifeTotalScore.toString()}\n", style: TextStyle(color: Colors.red)),
                       TextSpan(text: "Total tasks completed: "),
-                      TextSpan(text: (widget.progress.totalSuccess!.toInt() + widget.progress.totalFailed!.toInt()).toString() + "\n", style: TextStyle()),
+                      TextSpan(text: (widget.progress.totalSuccess!.toInt() + widget.progress.totalFailed!.toInt()).toString() + "\n", style: TextStyle(color: Colors.red)),
                       TextSpan(text: "Total tasks successed: "),
-                      TextSpan(text: widget.progress.totalSuccess.toString() + "\n", style: TextStyle()),
+                      TextSpan(text: widget.progress.totalSuccess.toString() + "\n", style: TextStyle(color: Colors.red)),
                       TextSpan(text: "Total tasks failed: "),
-                      TextSpan(text: widget.progress.totalFailed.toString() + "\n", style: TextStyle()),
+                      TextSpan(text: widget.progress.totalFailed.toString() + "\n", style: TextStyle(color: Colors.red)),
                     ])),
                   )
                 ]))

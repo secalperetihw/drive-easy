@@ -17,6 +17,7 @@ class requestAuth extends StatefulWidget {
   List<bool> isTutorialOn;
   List<OverlayTutorialRectEntry> tutorialOverlaysEntries;
   ValueChanged<Map> tutorialCallback;
+  int? displaylevel;
 
   requestAuth({ 
     required this.itemCallback,
@@ -29,6 +30,7 @@ class requestAuth extends StatefulWidget {
     required this.isTutorialOn,
     required this.tutorialOverlaysEntries,
     required this.tutorialCallback,
+    this.displaylevel,
     Key? key 
   }) : super(key: key);
 
@@ -166,6 +168,17 @@ class _requestAuthState extends State<requestAuth> {
                         return;
                       }
                       if (!Check()) {
+                        if (widget.item.authorized == true) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: const Text("You don't need to Authorize this request."),
+                            duration: const Duration(seconds: 3),
+                            action: SnackBarAction(
+                              label: 'OK',
+                              onPressed: () { },
+                            ),
+                          ));
+                          return;
+                        }
                         widget.item.authFailed = true;
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: const Text("Wrong request. You can auth again but won't get score."),

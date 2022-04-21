@@ -6,16 +6,18 @@ import 'package:drive_easy/static/requestsOnBoard.dart';
 class Progress {
   int? level;
   int? day;
-  double? totalScore;
+  int? totalScore = 0;
   double? rating;
   int? totalSuccess;
   int? totalFailed;
   int? lifeTotalSuccess;
   int? lifeTotalFailed;
-  double? lifeTotalScore;
+  int? lifeScore = 0;
+  int? lifeTotalScore = 0;
   double? textOffset;
   List<GameEmail>? emails;
   List<Item>? requests;
+  List<Item> previousRequests = [];
   Progress? restore;
   Map<String, bool>? tutorial;
 
@@ -43,7 +45,7 @@ class Progress {
   }
 
   static Progress createDefault() {
-    int num = 4;
+    int num = 0;
 
     return Progress(
       level: num,
@@ -139,5 +141,29 @@ class Progress {
     });
 
     return count;
+  }
+
+  String calRating() {
+    int total = totalScoreCount();
+    int score = scoreCount();
+
+    double rate = (lifeScore ?? 0).toDouble() / (lifeTotalScore ?? 0).toDouble();
+    rating = rate;
+  
+    if (rate > 0.95) {
+      return "SS";
+    } else if (rate > 0.9) {
+      return "S";
+    } else if (rate > 0.8) {
+      return "A";
+    } else if (rate > 0.7) {
+      return "B";
+    } else if (rate > 0.6) {
+      return "C";
+    } else if (rate > 0.5) {
+      return "D";
+    } else {
+      return "F";
+    }
   }
 }

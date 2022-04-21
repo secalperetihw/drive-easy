@@ -10,6 +10,7 @@ import 'package:flame/flame.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:googleapis/androidmanagement/v1.dart';
 import 'package:overlay_tutorial/overlay_tutorial.dart';
 
 class RequestMainPage extends StatefulWidget {
@@ -20,7 +21,9 @@ class RequestMainPage extends StatefulWidget {
   ValueChanged<Item> itemCallback;
   int tutorialOffset;
   bool tutorial;
-  // ValueChanged<Map> tutorialCallback;
+  DateTime timeNow;
+  int? displaylevel;
+  ValueChanged<Progress> progressCallback;
   // ValueChanged<Duration> timeCallback;
 
   RequestMainPage({ 
@@ -30,7 +33,9 @@ class RequestMainPage extends StatefulWidget {
     required this.itemCallback,
     required this.tutorialOffset,
     required this.tutorial,
-    // required this.tutorialCallback,
+    required this.timeNow,
+    this.displaylevel,
+    required this.progressCallback,
     this.info,
     Key? key 
   }) : super(key: key);
@@ -77,15 +82,12 @@ class _RequestMainPageState extends State<RequestMainPage> {
       _isTutorialEnabled = widget.progress.tutorial!["Authorization"]!;
       _isTutorialOn[14] = true;
       _isTutorialOn[0] = false;
-      print("here0");
     } else if (widget.progress.tutorial!["FirstPlay"]! && widget.progress.level == 0) {
       _isTutorialEnabled = widget.progress.tutorial!["FirstPlay"]!;
-      print("here1");
     } else if (widget.progress.tutorial!["Data"]! && widget.progress.level == 4) {
       _isTutorialEnabled = widget.progress.tutorial!["Data"]!;
       _isTutorialOn[17] = true;
       _isTutorialOn[0] = false;
-      print("here2");
     } else {
       _isTutorialEnabled = false;
     }
@@ -715,6 +717,8 @@ class _RequestMainPageState extends State<RequestMainPage> {
                         setState(() {
                           _isTutorialOn[19] = false;
                           _isTutorialEnabled = false;
+                          widget.progress.tutorial!["Data"] = false;
+                          widget.progressCallback(widget.progress);
                         });
                       }
                     )
@@ -759,6 +763,10 @@ class _RequestMainPageState extends State<RequestMainPage> {
             child: IconButton(
               icon: const Icon(Icons.arrow_back), 
               onPressed: () async {
+                if (widget.item.finish == true) {
+                  Navigator.pop(context);
+                  return;
+                }
                 if (pageController.page == 0){
                   bool exit = false;
                   await showDialog<void>(
@@ -798,8 +806,8 @@ class _RequestMainPageState extends State<RequestMainPage> {
                       _isTutorialOn[8] = true;
                     });
                   }
-                  current = 0;
-                  pageController.animateToPage(0, duration: Duration(milliseconds: 100), curve: Curves.ease);
+                  current--;
+                  pageController.animateToPage(current, duration: Duration(milliseconds: 100), curve: Curves.ease);
                 }
               },
             ),
@@ -836,7 +844,11 @@ class _RequestMainPageState extends State<RequestMainPage> {
                   Container(
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height * 0.2,
-                    child: Center(child: GameAnnoncement(item: widget.item, annoncement: announcement,))
+                    child: Center(child: GameAnnoncement(
+                      item: widget.item, 
+                      annoncement: announcement,
+                      time: widget.timeNow,
+                    ))
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width,
@@ -859,6 +871,7 @@ class _RequestMainPageState extends State<RequestMainPage> {
                       controller: pageController,
                       children: [
                         requestContents(
+                          displaylevel: widget.displaylevel,
                           annoncementCallback: (value) {
                             setState(() {
                               announcement = value;
@@ -945,7 +958,7 @@ class _RequestMainPageState extends State<RequestMainPage> {
                           },
                           page: rulesPage,
                         ),
-                        if (widget.progress.level! >= 4)
+                        if ((widget.displaylevel ?? widget.progress.level!) >= 4)
                           modifyPage(
                             isTutorialEnabled: _isTutorialEnabled,
                             isTutorialOn: _isTutorialOn,
@@ -994,7 +1007,7 @@ class _RequestMainPageState extends State<RequestMainPage> {
                   overlayTutorialEntry: tutorialOverlaysEntries[4],
                   child: IconButton(
                     iconSize: 20,
-                    icon: Icon(Icons.arrow_downward, color: Colors.white, size: 20,), 
+                    icon: Icon(Icons.arrow_downward, color: (current == 1) ? Colors.red : Colors.white, size: 20,), 
                     onPressed: (){
                       if (current < MAX_PAGE) current++;
                       if (_isTutorialEnabled && _isTutorialOn[4]) {

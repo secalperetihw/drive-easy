@@ -40,7 +40,10 @@ class WarningEmail extends GameEmail {
 
     bool check = true;
     itemField.forEach((key, value) {
-      if (!value) {
+      if (!value && key == "matchAandT") {
+        s += "  - Action and Request Type not match\n";
+        check = false;
+      } else if (!value) {
         s += "  - $key is not correct\n";
         check = false;
       }

@@ -4,6 +4,7 @@ import 'package:drive_easy/documents/Third_Party_Application.dart';
 import 'package:drive_easy/game/ui/computerPage.dart';
 import 'package:drive_easy/global.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class StartGamePage extends StatefulWidget {
   const StartGamePage({ Key? key }) : super(key: key);
@@ -18,6 +19,12 @@ class _StartGamePageState extends State<StartGamePage> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight
+    ]);
+    
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     return Scaffold(
       body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Center(child: Container(padding: EdgeInsets.all(20), child: Text("Game"),)),

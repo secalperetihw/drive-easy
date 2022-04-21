@@ -242,8 +242,6 @@ class _requestDenyState extends State<requestDeny> {
         if (score < 0) score = 0;
       }
     });
-    print(initMap);
-    print(map);
     item.success = check;
     item.score = score;
 

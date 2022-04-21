@@ -12,6 +12,8 @@ class GameBoardPage extends StatefulWidget {
   List<bool> isTutorialOn;
   List<OverlayTutorialRectEntry> tutorialOverlaysEntries;
   ValueChanged<Map> tutorialCallback;
+  ValueChanged<Progress> progressCallback;
+  DateTime timeNow;
 
   GameBoardPage({
     required this.progress,
@@ -21,6 +23,8 @@ class GameBoardPage extends StatefulWidget {
     required this.isTutorialOn,
     required this.tutorialOverlaysEntries,
     required this.tutorialCallback,
+    required this.timeNow,
+    required this.progressCallback,
     Key? key,
   }) : super(key: key);
 
@@ -54,7 +58,8 @@ class _GameBoardPageState extends State<GameBoardPage> {
             color: Colors.transparent,
             border: Border.all(width: 1, color: Colors.white)
           ),
-          child: ListView (
+          child: 
+          ListView (
             children: [
               Wrap(
                 alignment: WrapAlignment.spaceEvenly,
@@ -65,6 +70,12 @@ class _GameBoardPageState extends State<GameBoardPage> {
                       onTap: () async {
                         
                         await Navigator.push(context, MaterialPageRoute(builder: (context) => RequestMainPage(
+                          progressCallback: (value) {
+                            setState(() {
+                              widget.progress = value;
+                              widget.progressCallback(value);
+                            });
+                          },
                           tutorial: (widget.progress.tutorial!["FirstPlay"]! && widget.progress.level == 0) 
                           ? true 
                           : (widget.progress.tutorial!["Authorization"]! && widget.progress.level == 1)
@@ -72,7 +83,7 @@ class _GameBoardPageState extends State<GameBoardPage> {
                             : (widget.progress.tutorial!["Data"]! && widget.progress.level == 2)
                               ? true
                               : false,
-                          tutorialOffset: e.reqId,
+                          tutorialOffset: (e.reqId is String) ? int.parse(e.reqId) : e.reqId,
                           itemCallback: (value) {
                             setState(() {
                               e = value;
@@ -80,6 +91,7 @@ class _GameBoardPageState extends State<GameBoardPage> {
                           },
                           progress: widget.progress,
                           item: e,
+                          timeNow: widget.timeNow,
                         )));
                         if (e.finish ?? false)  {
                           if(e.checking ?? false) return;
@@ -94,7 +106,7 @@ class _GameBoardPageState extends State<GameBoardPage> {
                             int id = 0;
                             if (e.reqId == 0) id=2;
                             else if (e.reqId == 1) id=3;
-                            else if (e.reqId == 999) id=4;
+                            else if (e.reqId.toString() == "999") id=4;
                             if (widget.isTutorialOn[id] == true) {
                               widget.isTutorialOn[id] = false;
                               widget.isTutorialOn[id + 1] = true;
@@ -154,7 +166,7 @@ class _GameBoardPageState extends State<GameBoardPage> {
                       overlayTutorialEntry: widget.tutorialOverlaysEntries[3],
                       child: _callRequestPage,
                     );
-                  } else if (e.reqId == 999) {
+                  } else if (e.reqId == 999.toString()) {
                     return OverlayTutorialHole(
                       enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[4] : false,
                       overlayTutorialEntry: widget.tutorialOverlaysEntries[4],

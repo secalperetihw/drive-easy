@@ -179,7 +179,7 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
                           width: width,
                           color: (onhover[input.indexOf(e)] || ontap[input.indexOf(e)]) 
                             ? Colors.grey 
-                            : (widget.item.finish == true && widget.item.maliciousPosition![input.indexOf(e)] != null) 
+                            : (widget.item.finish == true && (widget.item.maliciousPosition?? {})[input.indexOf(e)] != null) 
                               ? Colors.red
                               : Colors.transparent,
                           child: GestureDetector(
@@ -270,7 +270,6 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
                           widget.item.wrappedAfterEncrpyt = false;
                           for (int i=0; i<14; i++) {
                             widget.item.content = widget.item.content! + input[i] + " ";
-                            print("input: ${input[i]}");
                           }
                           
                         }
@@ -388,8 +387,6 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
                     
                         text = input[ontap.indexOf(true)];
                         widget.callback({"item": widget.item});
-                    
-                        print(widget.item.score);
                       });
                     },
                     text: "Filter",

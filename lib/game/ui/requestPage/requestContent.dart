@@ -25,6 +25,7 @@ class requestContents extends StatefulWidget {
   List<OverlayTutorialRectEntry> tutorialOverlaysEntries;
   ValueChanged<Map> tutorialCallback;
   ValueChanged<Widget> annoncementCallback;
+  int? displaylevel;
 
   requestContents({
     required this.game,
@@ -42,6 +43,7 @@ class requestContents extends StatefulWidget {
     required this.tutorialCallback,
     required this.annoncementCallback,
     this.page,
+    this.displaylevel,
     Key? key,
   }) : super(key: key);
 
@@ -174,7 +176,7 @@ class _requestContentsState extends State<requestContents> {
                             color: (widget.progress.level! >= 2) ? null : Colors.grey.shade700,
                             onPressed: (value){
                               if(widget.item.finish ?? false) return;
-                              if(widget.progress.level! >= 2) {
+                              if((widget.displaylevel ?? widget.progress.level!) >= 2) {
                                 setState(() {
                                   widget.page = 1;
                                   pageController!.animateToPage(1, duration: Duration(milliseconds: 500), curve: Curves.ease);
@@ -280,6 +282,7 @@ class _requestContentsState extends State<requestContents> {
                       icon: Icon(Icons.arrow_back, color: Colors.white,),
                     ),
                     requestAuth(
+                      displaylevel: widget.displaylevel,
                       isTutorialEnabled: widget.isTutorialEnabled,
                       isTutorialOn: widget.isTutorialOn,
                       tutorialOverlaysEntries: widget.tutorialOverlaysEntries,

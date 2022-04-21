@@ -7,7 +7,7 @@ Employees Handbook
 //
 Jobs duty
 - 09:00 - 17:00 everyday
-- finish given number of tasks
+- identify correct package
 //
 Our Policies
 Basic policies:
@@ -41,12 +41,48 @@ Basic policies:
     .GET
     .POST
 
-Matching Action and File types:
+Matching Action and Request types:
     uplaod: POST
     download: GET
     transfer: POST
     
 //
+Authorization:
+!Authorization should be done every package before send out
+!Match the .action with request
+!Scope matching:
+ - Read only: GET (download)
+ - Write to app folder: POST
+ - Metadata only: GET (not used)
+ - All access: (none right now)
+//
+Data inspect:
+!Data inspection is now allowed.
+!Filter out all:
+ - include word function
+ - include word execute
+!after filtering, wrap with HTTP request
+!finally encrypt it.
+!done.
+//
 Special policies: 
+ - If one of Action or Request types incorrect, no need to choose "Unmatch Action and Request types"
  - Only Google Drive are allow to use both AES128 and AES256
  - Other must use AES256
+ - For now, priority of Authorization is higher than package basic info checking
+ - Authorization -> Data inspect -> basic info inspect -> approve/deny
+ - no matter you deny, score will given for Authorization and Data inspect as bonus
+//
+Score counting
+!Approve correct package: 2
+!Deny incorrect package: 1
+!Each match deny reason: 1
+!Each unmatch deny reason: -1
+!Authorization success: 1
+!Authorization random event: 0
+!Authorization failed: 0
+!Each correct filter: 1
+!Each missed filter: -1
+!Correctly warpped: 1
+!Correctly Encrypted: 1
+!Incorrect Warp, encrypt order: -1
