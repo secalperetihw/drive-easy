@@ -17,6 +17,8 @@ import 'package:drive_easy/documents/Why_correct_info_important.dart';
 import 'package:drive_easy/game/ui/documentsPage.dart';
 import 'package:drive_easy/game/ui/gameBoard.dart';
 import 'package:drive_easy/game/ui/gameEmailPage.dart';
+import 'package:drive_easy/game/ui/gameSetting.dart';
+import 'package:drive_easy/game/ui/makeRequest.dart';
 import 'package:drive_easy/game/ui/previousBoard.dart';
 import 'package:drive_easy/game/ui/report.dart';
 import 'package:drive_easy/classes/game/email.dart';
@@ -603,7 +605,17 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
                             onTap: (){
                               setState(() {
                                 _selectedIndex = 5;
-                                display = Container();
+                                display = GameSetting(
+                                  progress: gameProgress,
+                                  contentHeight: MediaQuery.of(context).size.height * 0.8,
+                                  contentWidth: MediaQuery.of(context).size.width * 0.8,
+                                  callback: (value) {
+                                    setState(() {
+                                      if (value["progress"] != null) gameProgress = value["progress"];
+                                      print(gameProgress.realMode);
+                                    });
+                                  },
+                                );
                               });
                             },
                             child: Container(
@@ -713,6 +725,31 @@ class _ComputerMainPageState extends State<ComputerMainPage> {
                                 border: (_selectedIndex == 7) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
                               ),
                               child: Icon(Icons.file_open, color: Colors.white,),
+                            ),
+                          ),
+                          if (gameProgress.realMode ?? false)
+                          GestureDetector(
+                            onTap: (){
+                              setState(() {
+                                _selectedIndex = 8;
+                                display = GameMakeRequest(
+                                  progress: gameProgress,
+                                  contentHeight: MediaQuery.of(context).size.height * 0.8,
+                                  contentWidth: MediaQuery.of(context).size.width * 0.8,
+                                  callback: (value) {
+                                    setState(() {
+                                      if (value["progresss"] != null) gameProgress = value["progress"];
+                                    });
+                                  },
+                                );
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                              decoration: BoxDecoration(
+                                border: (_selectedIndex == 8) ? Border(bottom: BorderSide(color: Colors.blue)) : null,
+                              ),
+                              child: Icon(Icons.upload, color: Colors.white,),
                             ),
                           ),
                         ],

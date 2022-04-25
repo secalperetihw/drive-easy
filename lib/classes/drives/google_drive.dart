@@ -119,10 +119,14 @@ class Google_drive_data extends Drive_data{
     });  
   }
 
+  @override
   Future<bool?> upload({
-    required DriveApi? driveApi,
-    required BuildContext context,
+    required driveApi,
+    required context,
   }) async {
+    (driveApi as DriveApi);
+    (context as BuildContext);
+
     if(driveApi == null) return false;
 
     // Select folder 'Drive-Easy' to continue
@@ -181,6 +185,24 @@ class Google_drive_data extends Drive_data{
     Navigator.pop(dismiss);
 
     return true;
+  }
+
+  @override
+  Future download({required driveApi, required context}) {
+    // TODO: implement download
+    throw UnimplementedError();
+  }
+
+  @override
+  Future transfer({required driveApi, required context, required Drive_data destination}) {
+    // TODO: implement transfer
+    throw UnimplementedError();
+  }
+
+  @override
+  Future getFileList({required driveApi, required context}) {
+    // TODO: implement transfer
+    throw UnimplementedError();
   }
   
   @override

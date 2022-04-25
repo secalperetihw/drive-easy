@@ -32,6 +32,30 @@ class onedrive_data extends Drive_data{
   }
 
   @override
+  Future upload({required driveApi, required context}) {
+    // TODO: implement upload
+    throw UnimplementedError();
+  }
+
+  @override
+  Future download({required driveApi, required context}) {
+    // TODO: implement download
+    throw UnimplementedError();
+  }
+
+  @override
+  Future transfer({required driveApi, required context, required Drive_data destination}) {
+    // TODO: implement transfer
+    throw UnimplementedError();
+  }
+
+  @override
+  Future getFileList({required driveApi, required context}) {
+    // TODO: implement transfer
+    throw UnimplementedError();
+  }
+
+  @override
   Map<String, dynamic> toJson(){
     return {};
   }

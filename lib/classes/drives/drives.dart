@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:googleapis/bigquery/v2.dart';
+import 'package:googleapis/drive/v3.dart';
 
 abstract class Drive_data{
   @protected
@@ -36,4 +37,12 @@ abstract class Drive_data{
   });
 
   Map<dynamic,dynamic> toJson();
+
+  Future upload({required driveApi, required context});
+
+  Future download({required driveApi, required context});
+
+  Future transfer({required driveApi, required context, required Drive_data destination});
+
+  Future getFileList({required driveApi, required context});
 }

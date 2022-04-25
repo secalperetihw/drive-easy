@@ -157,25 +157,30 @@ class _HandbookState extends State<Handbook> with AutomaticKeepAliveClientMixin<
                   ? OverlayTutorialHole(
                     enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[5] : false,
                     overlayTutorialEntry: (widget.isTutorialEnabled) ? widget.tutorialOverlaysEntries[5] : OverlayTutorialRectEntry(),
-                    child: ElevatedButton(
-                      onPressed: (){
-                        e.value();
-                        if (widget.isTutorialEnabled && widget.isTutorialOn[5]) {
-                          setState(() {
-                            widget.isTutorialOn[5] = false;
-                            widget.isTutorialOn[6] = true;
-                          });
-                        }
-                        
-                      }, 
-                      child: Text(e.key)
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: ElevatedButton(
+                        onPressed: (){
+                          e.value();
+                          if (widget.isTutorialEnabled && widget.isTutorialOn[5]) {
+                            setState(() {
+                              widget.isTutorialOn[5] = false;
+                              widget.isTutorialOn[6] = true;
+                            });
+                          }
+                          
+                        }, 
+                        child: Text(e.key)
+                      ),
                     ),
                   )
                   
-                  : ElevatedButton(
-                    onPressed: (){e.value();}, 
-                    child: Text(e.key)
-                  )
+                  : Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: ElevatedButton(
+                      onPressed: (){e.value();}, 
+                      child: Text(e.key)
+                  ))
                 ).toList(),
               ),
             )

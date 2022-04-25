@@ -20,6 +20,7 @@ class Progress {
   List<Item> previousRequests = [];
   Progress? restore;
   Map<String, bool>? tutorial;
+  bool? realMode = false;
 
   Progress({
     this.level,
@@ -36,6 +37,7 @@ class Progress {
     this.restore,
     this.tutorial,
     this.textOffset,
+    this.realMode,
   }){
     tutorial ??= {
       "FirstPlay": true,
@@ -45,7 +47,7 @@ class Progress {
   }
 
   static Progress createDefault() {
-    int num = 0;
+    int num = 4;
 
     return Progress(
       level: num,
