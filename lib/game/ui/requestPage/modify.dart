@@ -115,95 +115,100 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
               child: OverlayTutorialHole(
                 enabled: (widget.isTutorialEnabled) ? widget.isTutorialOn[18] : false,
                 overlayTutorialEntry: widget.tutorialOverlaysEntries[19],
-                child: ListView(
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  children: input.map((e) {
-                    double width = widget.contentWidth * textOffset;
-                  
-                    textPainter = CustomTextPainter(
-                      text: e,
-                      tutorialStyle: (widget.isTutorialEnabled == true && widget.item.maliciousPosition![input.indexOf(e)] != null && widget.isTutorialOn[18]) ? true : false,
-                      maxWidth: width,
-                    );
-                    textPainter.paint(Canvas(ui.PictureRecorder()), size);
-                    Offset offset = textPainter.returnOffset();
-                    size = Size(offset.dx, offset.dy);
-                  
-                    String s = "";
-                    input[input.indexOf(e)].codeUnits.forEach((element) { 
-                      s += element.toRadixString(16).padLeft(2, "0") + " ";
-                    });
-                    String text2 = s;
-                    textPainter2 = CustomTextPainter(
-                      text: text2,
-                      maxWidth: width * 3,
-                    );
-                    textPainter2.paint(Canvas(ui.PictureRecorder()), size);
-                    Offset offset2 = textPainter.returnOffset();
-                    size2 = Size(offset2.dx, offset2.dy);
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Container(
-                          child: Text( intFixed(input.indexOf(e), 2).toString(), style: TextStyle(color: Colors.white),)
-                        ),
-                  
-                        Container(
-                          width: width * 3,
-                          color: (onhover[input.indexOf(e)] || ontap[input.indexOf(e)]) 
-                            ? Colors.grey 
-                            : Colors.transparent,
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                ontap.forEach((element) {ontap[ontap.indexOf(element)] = false;});
-                  
-                                ontap[input.indexOf(e)] = true;
-                              });
-                            },
-                            child: MouseRegion(
-                              onEnter: (details) => setState(() => onhover[input.indexOf(e)] = true),
-                              onExit: (details) => setState(() => onhover[input.indexOf(e)] = false),
-                              child: CustomPaint(
-                                size: size2,
-                                painter: textPainter2,
-                              )
-                            ),
+                child: Scrollbar(
+                  thickness: 5,
+                  isAlwaysShown: true,
+                  interactive: true,
+                  child: ListView(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    children: input.map((e) {
+                      double width = widget.contentWidth * textOffset;
+                    
+                      textPainter = CustomTextPainter(
+                        text: e,
+                        tutorialStyle: (widget.isTutorialEnabled == true && widget.item.maliciousPosition![input.indexOf(e)] != null && widget.isTutorialOn[18]) ? true : false,
+                        maxWidth: width,
+                      );
+                      textPainter.paint(Canvas(ui.PictureRecorder()), size);
+                      Offset offset = textPainter.returnOffset();
+                      size = Size(offset.dx, offset.dy);
+                    
+                      String s = "";
+                      input[input.indexOf(e)].codeUnits.forEach((element) { 
+                        s += element.toRadixString(16).padLeft(2, "0") + " ";
+                      });
+                      String text2 = s;
+                      textPainter2 = CustomTextPainter(
+                        text: text2,
+                        maxWidth: width * 3,
+                      );
+                      textPainter2.paint(Canvas(ui.PictureRecorder()), size);
+                      Offset offset2 = textPainter.returnOffset();
+                      size2 = Size(offset2.dx, offset2.dy);
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Container(
+                            child: Text( intFixed(input.indexOf(e), 2).toString(), style: TextStyle(color: Colors.white),)
                           ),
-                        ),
-                  
-                        Container(
-                          // key: (widget.isTutorialEnabled == true && widget.item.maliciousPosition![input.indexOf(e)] != null && widget.isTutorialOn[18]) ? key : null,
-                          width: width,
-                          color: (onhover[input.indexOf(e)] || ontap[input.indexOf(e)]) 
-                            ? Colors.grey 
-                            : (widget.item.finish == true && (widget.item.maliciousPosition?? {})[input.indexOf(e)] != null) 
-                              ? Colors.red
+                    
+                          Container(
+                            width: width * 3,
+                            color: (onhover[input.indexOf(e)] || ontap[input.indexOf(e)]) 
+                              ? Colors.grey 
                               : Colors.transparent,
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                ontap.forEach((element) {ontap[ontap.indexOf(element)] = false;});
-                  
-                                ontap[input.indexOf(e)] = true;
-                                text = e;
-                              });
-                            },
-                            child: MouseRegion(
-                              onEnter: (details) => setState(() => onhover[input.indexOf(e)] = true),
-                              onExit: (details) => setState(() => onhover[input.indexOf(e)] = false),
-                              child: CustomPaint(
-                                size: size,
-                                painter: textPainter,
-                              )
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  ontap.forEach((element) {ontap[ontap.indexOf(element)] = false;});
+                    
+                                  ontap[input.indexOf(e)] = true;
+                                });
+                              },
+                              child: MouseRegion(
+                                onEnter: (details) => setState(() => onhover[input.indexOf(e)] = true),
+                                onExit: (details) => setState(() => onhover[input.indexOf(e)] = false),
+                                child: CustomPaint(
+                                  size: size2,
+                                  painter: textPainter2,
+                                )
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
+                    
+                          Container(
+                            // key: (widget.isTutorialEnabled == true && widget.item.maliciousPosition![input.indexOf(e)] != null && widget.isTutorialOn[18]) ? key : null,
+                            width: width,
+                            color: (onhover[input.indexOf(e)] || ontap[input.indexOf(e)]) 
+                              ? Colors.grey 
+                              : (widget.item.finish == true && (widget.item.maliciousPosition?? {})[input.indexOf(e)] != null) 
+                                ? Colors.red
+                                : Colors.transparent,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  ontap.forEach((element) {ontap[ontap.indexOf(element)] = false;});
+                    
+                                  ontap[input.indexOf(e)] = true;
+                                  text = e;
+                                });
+                              },
+                              child: MouseRegion(
+                                onEnter: (details) => setState(() => onhover[input.indexOf(e)] = true),
+                                onExit: (details) => setState(() => onhover[input.indexOf(e)] = false),
+                                child: CustomPaint(
+                                  size: size,
+                                  painter: textPainter,
+                                )
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
             ),
@@ -546,86 +551,6 @@ class _modifyPageState extends State<modifyPage> with AutomaticKeepAliveClientMi
   @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
-}
-
-class on9 extends StatelessWidget {
-  on9({
-    Key? key,
-    required this.width,
-    required this.onhover,
-    required this.input,
-    required this.ontap,
-    required this.size,
-    required this.textPainter,
-    required this.item,
-    required this.e,
-    required this.isTutorialEnabled,
-    required this.isTutorialOn,
-    required this.tutorialOverlaysEntries,
-    required this.gestureDectorOnTap,
-    required this.onEnter,
-    required this.onExit,
-  }) : super(key: key);
-
-  final double width;
-  final List<bool> onhover;
-  final List<String> input;
-  final List<bool> ontap;
-  final ui.Size size;
-  final CustomTextPainter textPainter;
-  final Item item;
-  final String e;
-  final bool isTutorialEnabled;
-  final List<bool> isTutorialOn;
-  final tutorialOverlaysEntries;
-  final Function gestureDectorOnTap;
-  final Function onEnter;
-  final Function onExit;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      color: (onhover[input.indexOf(e)] || ontap[input.indexOf(e)]) 
-        ? Colors.grey 
-        : (item.finish == true && item.maliciousPosition![input.indexOf(e)] != null) 
-          ? Colors.red
-          : Colors.transparent,
-      child: (isTutorialEnabled == true && item.maliciousPosition![input.indexOf(e)] != null && isTutorialOn[18]) 
-      ? OverlayTutorialHole(
-        
-        enabled: (isTutorialEnabled) ? isTutorialOn[18] : false,
-        overlayTutorialEntry: tutorialOverlaysEntries[19],
-        child: GestureDetector(
-          onTap: () {
-            gestureDectorOnTap();
-          },
-          child: MouseRegion(
-            onEnter: (details) => onEnter(),
-            onExit: (details) => onExit(),
-            child: CustomPaint(
-              size: size,
-              painter: textPainter,
-            )
-          ),
-        ),
-      )
-      
-      : GestureDetector(
-        onTap: () {
-          gestureDectorOnTap();
-        },
-        child: MouseRegion(
-          onEnter: (details) => onEnter(),
-          onExit: (details) => onExit(),
-          child: CustomPaint(
-            size: size,
-            painter: textPainter,
-          )
-        ),
-      ),
-    );
-  }
 }
 
 class CustomTextPainter extends CustomPainter { 
