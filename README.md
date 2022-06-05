@@ -3,9 +3,12 @@
 A Flutter project of educational game on Basic of Cloud.
 
 Planning: 
+
 A multi-cloud management application
 
+
 Done: Google Drive API, OneDrive API utilized
+
 To-do: UI, other cloud storage APIs.
 
 ## Getting Started
